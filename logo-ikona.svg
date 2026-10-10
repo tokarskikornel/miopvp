@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Ikonka karty: przecięte „M”. Litera jako kształt (nie tekst), bo plik ikony nie wczytuje czcionek. -->
+  <defs>
+    <linearGradient id="m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#8f9bb3"/></linearGradient>
+    <clipPath id="gora"><polygon points="0,0 48,0 48,17 0,31"/></clipPath>
+    <clipPath id="dol"><polygon points="0,31 48,17 48,48 0,48"/></clipPath>
+    <path id="litera" transform="skewX(-12) translate(6 0)" d="M8 40 V8 H17 L24 19 L31 8 H40 V40 H32 V22 L24 33 L16 22 V40 Z"/>
+  </defs>
+  <rect width="48" height="48" rx="10" fill="#1a1d27"/>
+  <g fill="url(#m)">
+    <use href="#litera" clip-path="url(#gora)"/>
+    <g clip-path="url(#dol)"><use href="#litera" transform="translate(2 2)"/></g>
+  </g>
+  <line x1="2" y1="32" x2="46" y2="18" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+</svg>

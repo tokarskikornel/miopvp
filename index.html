@@ -5,16 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MIO PVP — ranking</title>
 <meta name="description" content="Ranking, tiery i mecze serwera MIO PVP (miopvp.com).">
-<link rel="icon" href="ikony/MACE.png">
+<link rel="icon" href="logo-ikona.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;1,900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styl.css">
 </head>
 <body>
 <header>
   <div class="pasek">
-    <a class="logo" href="#ranking/ogolny">MIO PVP</a>
+    <a class="logo" href="#ranking/ogolny" aria-label="MIO PVP — ranking">
+      <!-- Logo: napis przecięty ukośnie; dolna połowa przesunięta jak po cięciu mieczem. -->
+      <svg width="163" height="34" viewBox="0 0 230 48" role="img" aria-hidden="true">
+        <defs>
+          <linearGradient id="logo-mio" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#efeff1"/><stop offset="1" stop-color="#8f9bb3"/></linearGradient>
+          <linearGradient id="logo-pvp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9d0dd"/><stop offset="1" stop-color="#6f7a91"/></linearGradient>
+          <clipPath id="logo-gora"><polygon points="0,0 230,0 230,14 0,30"/></clipPath>
+          <clipPath id="logo-dol"><polygon points="0,30 230,14 230,48 0,48"/></clipPath>
+        </defs>
+        <g font-family="Archivo, 'Arial Black', sans-serif" font-weight="900" font-style="italic" font-size="40" letter-spacing="1">
+          <g clip-path="url(#logo-gora)"><text x="4" y="41" fill="url(#logo-mio)">MIO</text><text x="100" y="41" fill="url(#logo-pvp)">PVP</text></g>
+          <g clip-path="url(#logo-dol)" transform="translate(3 2)"><text x="4" y="41" fill="url(#logo-mio)">MIO</text><text x="100" y="41" fill="url(#logo-pvp)">PVP</text></g>
+        </g>
+        <line x1="-2" y1="31.5" x2="222" y2="15" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="222" cy="15" r="2.5" fill="#ffffff"/>
+      </svg>
+    </a>
     <nav>
       <a id="nav-ranking" href="#ranking/ogolny">Ranking</a>
       <a id="nav-mecze" href="#mecze">Mecze</a>

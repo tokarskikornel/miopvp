@@ -19,8 +19,8 @@ a { color: inherit; }
 
 header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(14px); background: rgba(16,18,24,.78); border-bottom: 1px solid var(--linia); }
 .pasek { max-width: 1100px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 22px; }
-.logo { font-weight: 800; font-size: 20px; letter-spacing: .06em; text-decoration: none;
-  background: linear-gradient(90deg, #efeff1, #8f9bb3); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.logo { display: block; line-height: 0; flex-shrink: 0; }
+.logo svg { display: block; }
 nav a { color: var(--etykieta); text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: 13px; margin-right: 16px; }
 nav a.akt, nav a:hover { color: var(--wartosc); }
 .szukaj { margin-left: auto; }
