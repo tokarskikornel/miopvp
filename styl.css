@@ -102,7 +102,103 @@ footer { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; display: fl
   font-size: 13px; color: var(--cichy); border-top: 1px solid var(--linia); }
 .kopiuj { color: var(--wartosc); background: none; border: 1px solid var(--linia2); border-radius: 8px; padding: 3px 10px; margin-left: 8px; font: inherit; cursor: pointer; }
 
+/* ---------- Ranking: baner, podium, karty (inspiracja: PvPHQ "Overall Ladder") ---------- */
+.baner { margin-top: 24px; padding: 30px 26px; border-radius: 20px; border: 1px solid var(--linia2); display: flex; align-items: flex-end; gap: 20px;
+  background:
+    radial-gradient(600px 220px at 85% 0%, rgba(143,155,179,.22), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(239,239,241,.025) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(0deg, rgba(239,239,241,.025) 0 1px, transparent 1px 32px),
+    linear-gradient(135deg, #1d2130, #12141b); }
+.baner h1 { margin: 2px 0 6px; color: var(--wartosc); font-size: clamp(30px, 5vw, 46px); font-weight: 800; letter-spacing: -.01em; line-height: 1.05; }
+.akcent { background: linear-gradient(90deg, #efeff1, #8f9bb3); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.baner-liczba { margin-left: auto; text-align: right; }
+.baner-liczba b { display: block; color: var(--wartosc); font-size: 26px; }
+.baner-liczba span { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: var(--cichy); font-weight: 700; }
+.baner-liczba small { font-size: 12px; color: var(--cichy); }
+
+.pigulki { margin-top: 18px; padding-bottom: 8px; border-bottom: 2px solid var(--linia); }
+.pig { padding: 10px 18px; font-size: 14px; }
+.pig img { width: 22px; height: 22px; }
+.pig.akt { background: linear-gradient(180deg, #efeff1, #b9c1d3); color: #12141b; border-color: transparent; box-shadow: 0 4px 18px rgba(239,239,241,.18); }
+
+.podium { display: grid; grid-template-columns: 1fr 1.05fr 1fr; gap: 18px; align-items: end; margin: 60px 0 26px; }
+.podium-karta { --kolor: var(--t2); position: relative; display: flex; flex-direction: column; align-items: center; text-decoration: none;
+  padding: 40px 16px 20px; border-radius: 18px; border: 1.5px solid color-mix(in srgb, var(--kolor) 70%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--kolor) 9%, var(--karta)), #13151c);
+  box-shadow: 0 0 34px color-mix(in srgb, var(--kolor) 16%, transparent), inset 0 1px 0 rgba(255,255,255,.06); transition: translate .2s; }
+.podium-karta:hover { translate: 0 -4px; }
+.podium-karta.p1 { --kolor: var(--t1); padding-top: 52px; padding-bottom: 26px; }
+.podium-karta.p2 { --kolor: var(--t2); }
+.podium-karta.p3 { --kolor: var(--t3); }
+.cialo { height: 120px; image-rendering: pixelated; filter: drop-shadow(0 10px 10px rgba(0,0,0,.45)); margin-bottom: 12px; }
+.p1 .cialo { height: 150px; }
+.podium-nick { color: var(--wartosc); font-size: 19px; font-weight: 700; }
+.p1 .podium-nick { font-size: 22px; }
+.podium-opis { color: var(--kolor); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; margin: 2px 0 8px; }
+.podium-liczba { color: var(--wartosc); font-size: 30px; font-weight: 800; line-height: 1.1; margin-top: 6px; }
+.p1 .podium-liczba { font-size: 36px; }
+.podium-jedn { font-size: 10px; text-transform: uppercase; letter-spacing: .16em; color: var(--cichy); font-weight: 700; }
+.odznaka { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); width: 46px; height: 50px; display: grid; place-items: center;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--kolor) 100%, white 25%), color-mix(in srgb, var(--kolor) 70%, black)); }
+.odznaka span { color: #15171e; font-weight: 800; font-size: 20px; font-family: "JetBrains Mono", monospace; }
+.odznaka.szesciokat { clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+.odznaka.tarcza { clip-path: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%); }
+.odznaka.gwiazda { top: -34px; width: 64px; height: 62px; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+.odznaka.gwiazda span { margin-top: 6px; }
+.p1::before { content: "♛"; position: absolute; top: -66px; left: 50%; transform: translateX(-50%); color: var(--t1); font-size: 26px; text-shadow: 0 0 14px rgba(245,197,66,.5); }
+
+.lista-pasek { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13px; margin: 6px 0 10px; }
+.karty-graczy { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.karta-gracza { display: flex; align-items: center; gap: 14px; padding: 10px 16px 10px 0; text-decoration: none; border-radius: 14px;
+  background: var(--karta); border: 1px solid var(--linia); border-left: 3px solid var(--linia2); transition: border-color .15s; }
+.karta-gracza:hover { border-color: var(--linia2); }
+.kg-miejsce { width: 56px; text-align: center; color: var(--cichy); font-size: 20px; font-weight: 700; align-self: stretch; display: grid; place-items: center; border-right: 1px solid var(--linia); }
+.karta-gracza > img { width: 44px; height: 44px; border-radius: 8px; image-rendering: pixelated; }
+.kg-srodek { min-width: 0; }
+.kg-nick { color: var(--wartosc); font-weight: 700; font-size: 16px; }
+.kg-tiery { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 12px; margin-top: 2px; }
+.kg-tier { display: inline-flex; align-items: center; gap: 3px; font-weight: 800; }
+.kg-tier img { width: 15px; height: 15px; image-rendering: pixelated; }
+.kg-liczba { margin-left: auto; text-align: right; }
+.kg-liczba b { display: block; color: var(--wartosc); font-size: 22px; }
+.kg-liczba span { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: var(--cichy); font-weight: 700; }
+
+/* ---------- Animacje (wylaczone przy "ogranicz ruch") ---------- */
+@keyframes wjazd { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes pojaw { from { opacity: 0; } to { opacity: 1; } }
+@keyframes wyskok { 0% { transform: translateX(-50%) scale(0) rotate(-20deg); } 70% { transform: translateX(-50%) scale(1.15) rotate(4deg); } 100% { transform: translateX(-50%) scale(1); } }
+@keyframes korona { 0%, 100% { text-shadow: 0 0 10px rgba(245,197,66,.35); transform: translateX(-50%) translateY(0); }
+  50% { text-shadow: 0 0 22px rgba(245,197,66,.85); transform: translateX(-50%) translateY(-3px); } }
+@keyframes blask { 0%, 100% { box-shadow: 0 0 30px color-mix(in srgb, var(--kolor) 14%, transparent), inset 0 1px 0 rgba(255,255,255,.06); }
+  50% { box-shadow: 0 0 46px color-mix(in srgb, var(--kolor) 30%, transparent), inset 0 1px 0 rgba(255,255,255,.08); } }
+@keyframes bujanie { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+@keyframes rysuj { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .widok { animation: pojaw .35s ease-out; }
+  .baner { animation: wjazd .5s cubic-bezier(.16,1,.3,1); }
+  .podium-karta { opacity: 0; animation: wjazd .7s cubic-bezier(.16,1,.3,1) forwards; }
+  .podium-karta.p3 { animation-delay: .1s; }
+  .podium-karta.p2 { animation-delay: .25s; }
+  .podium-karta.p1 { animation: wjazd .8s cubic-bezier(.16,1,.3,1) .4s forwards, blask 3.5s ease-in-out 1.3s infinite; }
+  .odznaka { animation: wyskok .55s cubic-bezier(.34,1.56,.64,1) backwards; animation-delay: inherit; }
+  .p3 .odznaka { animation-delay: .45s; } .p2 .odznaka { animation-delay: .6s; } .p1 .odznaka { animation-delay: .85s; }
+  .p1::before { animation: korona 2.6s ease-in-out 1.2s infinite; }
+  .podium-karta:hover .cialo { animation: bujanie .8s ease-in-out; }
+  .kaskada > * { opacity: 0; animation: wjazd .45s cubic-bezier(.16,1,.3,1) forwards; animation-delay: calc(var(--i, 0) * 45ms + .15s); }
+  .karta-gracza, .kit, .mecz { transition: transform .15s, border-color .15s, box-shadow .15s; }
+  .karta-gracza:hover, .kit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+  .pig { transition: background .2s, color .2s, box-shadow .2s, transform .15s; }
+  .pig:hover { transform: translateY(-1px); }
+  .wykres svg { animation: rysuj 1.3s cubic-bezier(.45,0,.2,1) .15s backwards; }
+
+}
+
 @media (max-width: 760px) {
+  .baner { flex-direction: column; align-items: flex-start; } .baner-liczba { margin-left: 0; text-align: left; }
+  .podium { grid-template-columns: 1fr; gap: 40px; margin-top: 50px; }
+  .podium-karta.p1 { order: -1; }
+  .karty-graczy { grid-template-columns: 1fr; }
   .pasek { gap: 12px; flex-wrap: wrap; }
   .szukaj { margin-left: 0; width: 100%; } .szukaj input { width: 100%; }
   .kity { grid-template-columns: repeat(2, 1fr); } .dwie { grid-template-columns: 1fr; }
@@ -111,3 +207,6 @@ footer { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; display: fl
   .ukryj-tel { display: none; }
   td, th { padding: 8px 8px; }
 }
+
+/* Sortowanie w kicie: podium i baner zostaja na miejscu, tasuja sie tylko karty. */
+.cisza .baner, .cisza .podium-karta, .cisza .odznaka, .cisza .p1::before { animation: none !important; opacity: 1; }

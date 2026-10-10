@@ -31,6 +31,31 @@ const kitPoKluczu = klucz => dane.kity.find(k => k.klucz === klucz) || { klucz, 
 const ikonaKitu = klucz => el('img', { src: `ikony/${kitPoKluczu(klucz).ikona}.png`, alt: '', onerror: e => e.target.remove() });
 const nazwaKitu = klucz => kitPoKluczu(klucz).nazwa;
 const ZNAK = n => (n > 0 ? '+' : n < 0 ? '−' : '±') + Math.abs(n);
+const ruch = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** Dzieci pojawiaja sie jedno po drugim (CSS .kaskada + zmienna --i). */
+function kaskada(kontener) {
+  kontener.classList.add('kaskada');
+  [...kontener.children].forEach((d, i) => d.style.setProperty('--i', Math.min(i, 20)));
+  return kontener;
+}
+
+/** Liczby na podium odliczaja sie od zera (po wjezdzie karty). */
+function odliczanie() {
+  if (!ruch()) return;
+  document.querySelectorAll('.podium-liczba').forEach((e, i) => {
+    const cel = Number(e.textContent);
+    const opoznienie = [450, 650, 300][i] ?? 400; // kolejnosc w HTML: 2., 1., 3. miejsce
+    e.textContent = '0';
+    const start = performance.now() + opoznienie;
+    const krok = t => {
+      const p = Math.min(1, Math.max(0, (t - start) / 900));
+      e.textContent = String(Math.round(cel * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(krok);
+    };
+    requestAnimationFrame(krok);
+  });
+}
 
 function czasTemu(iso) {
   const s = (Date.now() - new Date(iso).getTime()) / 1000;
@@ -61,73 +86,113 @@ function pigulki(aktywny) {
   return p;
 }
 
+/**
+ * Ranking jak "Overall Ladder" z PvPHQ, w kolorach MIO PVP: baner, pigulki, podium TOP 3
+ * (1 zloto, 2 srebro, 3 braz - te same kolory co tiery 1-3), dalej karty w dwoch kolumnach.
+ */
 function pokazRanking(kit) {
   if (kit !== 'ogolny' && !dane.rankingi[kit]) kit = 'ogolny';
+  const ogolny = kit === 'ogolny';
+  // Jeden format dla obu widokow: liczba = punkty (Ogolny) albo ELO (kit).
+  // Kolejnosc rankingu (podium i numery miejsc) zawsze wg tieru/ELO; sortowanie zmienia tylko kolejnosc kart 4+.
+  const wgRankingu = ogolny
+    ? dane.ogolny.map((g, i) => ({ nick: g.nick, liczba: g.punkty, jednostka: 'pkt', tiery: g.tiery, miejsce: i + 1 }))
+    : dane.rankingi[kit].gracze.map((g, i) => ({ nick: g.nick, liczba: g.elo, jednostka: 'ELO', tier: g.tier, gr: g, miejsce: i + 1 }));
+  const reszta = ogolny ? wgRankingu.slice(3)
+    : posortowane(wgRankingu.slice(3).map(g => ({ ...g.gr, _g: g }))).map(x => x._g);
+  const gracze = wgRankingu.slice(0, 3).concat(reszta);
+  const wszystkich = Object.keys(dane.gracze).length;
+
   tresc.replaceChildren(
-    el('h2', {}, 'Ranking'),
-    el('div', { class: 'pod' }, 'Tiery liczą się tylko z walk Ranked. Pierwsze ' + dane.progi.kwalifikacje + ' walk w kicie to kwalifikacje.'),
+    baner(ogolny ? 'Ogólny' : nazwaKitu(kit), gracze.length, wszystkich),
     pigulki(kit),
-    kit === 'ogolny' ? tabelaOgolna() : tabelaKitu(kit));
+    gracze.length ? podium(gracze.slice(0, 3)) : el('div', { class: 'karta pusto' },
+      ogolny ? 'Nikt jeszcze nie skończył kwalifikacji.' : 'Nikt jeszcze nie ma tieru w ' + nazwaKitu(kit) + '.'),
+    gracze.length > 3 ? el('div', { class: 'lista-pasek' },
+      el('span', {}, 'Pokazano ', el('b', { class: 'wart' }, gracze.length), ' graczy'),
+      ogolny ? el('span', { class: 'sekcja-tytul', style: 'margin:0' }, 'Według tieru') : sortowanieKitu(kit)) : null,
+    gracze.length > 3 ? kaskada(el('div', { class: 'karty-graczy' }, gracze.slice(3).map(g => kartaGracza(g, g.miejsce)))) : null,
+    !ogolny && dane.rankingi[kit].kwalifikacje.length ? el('div', { class: 'karta uwaga-dol', style: 'margin-top:14px' }, 'W kwalifikacjach:',
+      dane.rankingi[kit].kwalifikacje.map(k => el('span', {}, linkGracza(k.nick, 40), ' ',
+        el('span', { class: 'kwal' }, k.mecze + '/' + dane.progi.kwalifikacje)))) : null);
 }
 
-function tabelaOgolna() {
-  if (!dane.ogolny.length) return el('div', { class: 'karta pusto' }, 'Nikt jeszcze nie skończył kwalifikacji.');
-  const wiersze = dane.ogolny.map((g, i) => el('tr', {},
-    el('td', { class: 'miejsce num m' + (i + 1) }, i + 1),
-    el('td', {}, linkGracza(g.nick)),
-    el('td', { class: 'num wart' }, g.punkty),
-    el('td', {}, dane.kity.filter(k => g.tiery[k.klucz]).map(k =>
-      el('span', { title: k.nazwa }, plakietkaTieru(g.tiery[k.klucz]))))));
-  return el('div', { class: 'karta' }, el('table', {},
-    el('thead', {}, el('tr', {}, el('th', {}, '#'), el('th', {}, 'Gracz'), el('th', {}, 'Punkty'), el('th', {}, 'Tiery'))),
-    el('tbody', {}, wiersze)));
+function baner(nazwa, wRankingu, wszystkich) {
+  return el('div', { class: 'baner' },
+    el('div', {},
+      el('p', { class: 'sekcja-tytul' }, 'Ranking kompetytywny'),
+      el('h1', {}, 'Ranking ', el('span', { class: 'akcent' }, nazwa)),
+      el('div', { class: 'pod', style: 'margin:0' }, 'Tiery tylko z walk Ranked · pierwsze ' + dane.progi.kwalifikacje + ' walk w kicie to kwalifikacje')),
+    el('div', { class: 'baner-liczba' }, el('b', { class: 'num' }, wRankingu), el('span', {}, 'w rankingu'),
+      el('small', {}, 'z ' + wszystkich + ' graczy')));
 }
 
-const KOLUMNY = [
+const MIEJSCA = [
+  { klasa: 'p1', znak: 'gwiazda', opis: '♛ Mistrz' },
+  { klasa: 'p2', znak: 'szesciokat', opis: '2. miejsce' },
+  { klasa: 'p3', znak: 'tarcza', opis: '3. miejsce' },
+];
+
+function podium(top) {
+  // Kolejnosc na ekranie: 2, 1, 3 (zwyciezca w srodku).
+  const uklad = [1, 0, 2].filter(i => top[i]);
+  return el('div', { class: 'podium' }, uklad.map(i => {
+    const g = top[i];
+    const m = MIEJSCA[i];
+    return el('a', { class: 'podium-karta ' + m.klasa, href: '#gracz/' + encodeURIComponent(g.nick) },
+      el('div', { class: 'odznaka ' + m.znak }, el('span', {}, i + 1)),
+      el('img', { class: 'cialo', src: `https://mc-heads.net/body/${encodeURIComponent(g.nick)}/${i === 0 ? 150 : 120}`, alt: '', loading: 'lazy' }),
+      el('div', { class: 'podium-nick' }, g.nick),
+      el('div', { class: 'podium-opis' }, m.opis),
+      g.tier ? plakietkaTieru(g.tier) : null,
+      el('div', { class: 'podium-liczba num' }, g.liczba),
+      el('div', { class: 'podium-jedn' }, g.jednostka === 'pkt' ? 'punktów' : 'ELO'));
+  }));
+}
+
+function kartaGracza(g, miejsce) {
+  return el('a', { class: 'karta-gracza', href: '#gracz/' + encodeURIComponent(g.nick) },
+    el('div', { class: 'kg-miejsce num' }, miejsce),
+    glowa(g.nick, 64),
+    el('div', { class: 'kg-srodek' },
+      el('div', { class: 'kg-nick' }, g.nick),
+      el('div', { class: 'kg-tiery' }, g.tiery
+        ? dane.kity.filter(k => g.tiery[k.klucz]).map(k => el('span', { class: 'kg-tier ' + tierKlasa(g.tiery[k.klucz]), title: k.nazwa },
+          ikonaKitu(k.klucz), g.tiery[k.klucz]))
+        : [plakietkaTieru(g.tier), el('span', { class: 'num' }, el('span', { class: 'plus' }, g.gr.wygrane), ' / ',
+          el('span', { class: 'minus' }, g.gr.przegrane), ' · ' + Math.round(winrate(g.gr) * 100) + '%')])),
+    el('div', { class: 'kg-liczba' }, el('b', { class: 'num' }, g.liczba), el('span', {}, g.jednostka)));
+}
+
+const SORTY = [
   { kol: 'elo', nazwa: 'Tier', wartosc: g => g.elo },
-  { kol: 'elo2', nazwa: 'ELO', wartosc: g => g.elo },
-  { kol: 'wygrane', nazwa: 'W / L', wartosc: g => g.wygrane },
   { kol: 'winrate', nazwa: 'Winrate', wartosc: g => winrate(g) },
+  { kol: 'wygrane', nazwa: 'Wygrane', wartosc: g => g.wygrane },
+  { kol: 'nick', nazwa: 'Nick' },
 ];
 const winrate = g => (g.wygrane + g.przegrane ? g.wygrane / (g.wygrane + g.przegrane) : 0);
 
-function tabelaKitu(kit) {
-  const r = dane.rankingi[kit];
-  const karta = el('div', { class: 'karta' });
-  if (!r.gracze.length) {
-    karta.append(el('div', { class: 'pusto' }, 'Nikt jeszcze nie ma tieru w ' + nazwaKitu(kit) + '.'));
-  } else {
-    const kolumna = KOLUMNY.find(k => k.kol === sortowanie.kol);
-    const gracze = [...r.gracze].sort((a, b) => {
-      if (sortowanie.kol === 'nick') return (sortowanie.malejaco ? -1 : 1) * a.nick.localeCompare(b.nick);
-      const roznica = kolumna.wartosc(b) - kolumna.wartosc(a);
-      return (sortowanie.malejaco ? roznica : -roznica) || a.nick.localeCompare(b.nick);
-    });
-    const naglowek = (kol, nazwa, klasa) => el('th', {
-      class: 'sortuj' + (sortowanie.kol === kol ? ' akt' : '') + (klasa ? ' ' + klasa : ''),
+function posortowane(lista) {
+  const sort = SORTY.find(s => s.kol === sortowanie.kol) || SORTY[0];
+  return [...lista].sort((a, b) => {
+    if (sort.kol === 'nick') return (sortowanie.malejaco ? -1 : 1) * a.nick.localeCompare(b.nick);
+    const roznica = sort.wartosc(b) - sort.wartosc(a);
+    return (sortowanie.malejaco ? roznica : -roznica) || a.nick.localeCompare(b.nick);
+  });
+}
+
+/** Przyciski sortowania nad lista kitu; drugi klik odwraca kolejnosc. */
+function sortowanieKitu(kit) {
+  return el('div', { class: 'mini-pig', style: 'margin:0' }, el('span', { class: 'sekcja-tytul', style: 'margin:0 6px 0 0' }, 'Sortuj:'),
+    SORTY.map(s => el('button', {
+      type: 'button', class: sortowanie.kol === s.kol ? 'akt' : null,
       onclick: () => {
-        sortowanie.malejaco = sortowanie.kol === kol ? !sortowanie.malejaco : kol !== 'nick';
-        sortowanie.kol = kol;
+        sortowanie.malejaco = sortowanie.kol === s.kol ? !sortowanie.malejaco : s.kol !== 'nick';
+        sortowanie.kol = s.kol;
         pokazRanking(kit);
+        tresc.classList.add('cisza'); // przy sortowaniu bez ponownego wjazdu podium
       },
-    }, nazwa + (sortowanie.kol === kol ? (sortowanie.malejaco ? ' ▾' : ' ▴') : ''));
-    karta.append(el('table', {},
-      el('thead', {}, el('tr', {}, el('th', {}, '#'), naglowek('nick', 'Gracz'), naglowek('elo', 'Tier'),
-        naglowek('elo2', 'ELO'), naglowek('wygrane', 'W / L'), naglowek('winrate', 'Winrate', 'ukryj-tel'))),
-      el('tbody', {}, gracze.map((g, i) => el('tr', {},
-        el('td', { class: 'miejsce num m' + (i + 1) }, i + 1),
-        el('td', {}, linkGracza(g.nick)),
-        el('td', {}, plakietkaTieru(g.tier)),
-        el('td', { class: 'num wart' }, g.elo),
-        el('td', { class: 'num' }, el('span', { class: 'plus' }, g.wygrane), ' / ', el('span', { class: 'minus' }, g.przegrane)),
-        el('td', { class: 'num ukryj-tel' }, Math.round(winrate(g) * 100) + '%'))))));
-  }
-  if (r.kwalifikacje.length) {
-    karta.append(el('div', { class: 'uwaga-dol' }, 'W kwalifikacjach:',
-      r.kwalifikacje.map(k => el('span', {}, linkGracza(k.nick, 40), ' ',
-        el('span', { class: 'kwal' }, k.mecze + '/' + dane.progi.kwalifikacje)))));
-  }
-  return karta;
+    }, s.nazwa + (sortowanie.kol === s.kol ? (sortowanie.malejaco ? ' ▾' : ' ▴') : ''))));
 }
 
 // ---------- MECZE ----------
@@ -150,7 +215,7 @@ function pokazMecze() {
   tresc.replaceChildren(
     el('h2', {}, 'Mecze'),
     el('div', { class: 'pod' }, 'Ostatnie walki na serwerze — Ranked i Unranked.'),
-    dane.mecze.length ? el('div', { class: 'karta' }, dane.mecze.map(wierszMeczu))
+    dane.mecze.length ? kaskada(el('div', { class: 'karta' }, dane.mecze.map(wierszMeczu)))
       : el('div', { class: 'karta pusto' }, 'Brak walk. Wejdź na miopvp.duckdns.org i zagraj!'));
 }
 
@@ -167,7 +232,7 @@ function pokazGracza(nick) {
   const gl = g.globalnie;
   const kd = gl.smierci ? (gl.zabojstwa / gl.smierci).toFixed(2) : String(gl.zabojstwa);
 
-  const kity = el('div', { class: 'kity' }, dane.kity.map(k => {
+  const kity = kaskada(el('div', { class: 'kity' }, dane.kity.map(k => {
     const s = g.kity[k.klucz];
     return el('div', { class: 'kit' },
       el('div', { class: 'naz' }, ikonaKitu(k.klucz), k.nazwa),
@@ -175,7 +240,7 @@ function pokazGracza(nick) {
         : s.tier ? plakietkaTieru(s.tier)
           : el('span', { class: 'kwal' }, `Kwalifikacje ${s.kwalifikacje}/${dane.progi.kwalifikacje}`),
       el('div', { class: 'elo num' }, s && s.tier ? `${s.elo} ELO · ${s.wygrane}W/${s.przegrane}L` : '—'));
-  }));
+  })));
 
   const kityWykresu = dane.kity.map(k => k.klucz).filter(k => (g.wykres[k] || []).length);
   const miejsceWykresu = el('div');
@@ -286,6 +351,10 @@ function pokaz() {
   if (widok === 'mecze') pokazMecze();
   else if (widok === 'gracz' && arg) pokazGracza(arg);
   else pokazRanking(arg || 'ogolny');
+  tresc.classList.remove('widok', 'cisza');
+  void tresc.offsetWidth; // restart animacji pojawienia sie
+  tresc.classList.add('widok');
+  odliczanie();
   window.scrollTo(0, 0);
 }
 
