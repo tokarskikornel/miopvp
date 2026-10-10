@@ -216,7 +216,7 @@ function pokazMecze() {
     el('h2', {}, 'Mecze'),
     el('div', { class: 'pod' }, 'Ostatnie walki na serwerze — Ranked i Unranked.'),
     dane.mecze.length ? kaskada(el('div', { class: 'karta' }, dane.mecze.map(wierszMeczu)))
-      : el('div', { class: 'karta pusto' }, 'Brak walk. Wejdź na miopvp.duckdns.org i zagraj!'));
+      : el('div', { class: 'karta pusto' }, 'Brak walk. Wejdź na miopvp.com i zagraj!'));
 }
 
 // ---------- PROFIL ----------
@@ -367,7 +367,7 @@ document.getElementById('szukaj-pole').addEventListener('change', e => {
   if (dane && dane.gracze[e.target.value]) location.hash = '#gracz/' + encodeURIComponent(e.target.value);
 });
 document.getElementById('kopiuj').addEventListener('click', e => {
-  navigator.clipboard?.writeText('miopvp.duckdns.org').then(() => { e.target.textContent = 'Skopiowano!'; });
+  navigator.clipboard?.writeText('miopvp.com').then(() => { e.target.textContent = 'Skopiowano!'; });
 });
 
 fetch('dane.json', { cache: 'no-store' })
