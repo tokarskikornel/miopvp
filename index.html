@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIO PVP — ranking</title>
+<meta name="description" content="Ranking, tiery i mecze serwera MIO PVP (miopvp.duckdns.org).">
+<link rel="icon" href="ikony/MACE.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styl.css">
+</head>
+<body>
+<header>
+  <div class="pasek">
+    <a class="logo" href="#ranking/ogolny">MIO PVP</a>
+    <nav>
+      <a id="nav-ranking" href="#ranking/ogolny">Ranking</a>
+      <a id="nav-mecze" href="#mecze">Mecze</a>
+    </nav>
+    <form id="szukaj" class="szukaj" autocomplete="off">
+      <input id="szukaj-pole" list="nicki" placeholder="Szukaj gracza…" aria-label="Szukaj gracza">
+      <datalist id="nicki"></datalist>
+    </form>
+  </div>
+</header>
+
+<main id="tresc"><p class="info">Wczytywanie…</p></main>
+
+<footer>
+  <span id="zaktualizowano"></span>
+  <span>miopvp.duckdns.org <button id="kopiuj" class="kopiuj" type="button">Kopiuj</button></span>
+</footer>
+
+<script src="strona.js"></script>
+</body>
+</html>
