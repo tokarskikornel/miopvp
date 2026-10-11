@@ -210,3 +210,10 @@ footer { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; display: fl
 
 /* Sortowanie w kicie: podium i baner zostaja na miejscu, tasuja sie tylko karty. */
 .cisza .baner, .cisza .podium-karta, .cisza .odznaka, .cisza .p1::before { animation: none !important; opacity: 1; }
+
+/* Ranking kitu pokazuje tier zamiast ELO - kolor tieru ma wygrac z kolorem liczby. */
+.podium-liczba.t1, .kg-liczba b.t1 { color: var(--t1); }
+.podium-liczba.t2, .kg-liczba b.t2 { color: var(--t2); }
+.podium-liczba.t3, .kg-liczba b.t3 { color: var(--t3); }
+.podium-liczba.t4, .kg-liczba b.t4 { color: var(--t4); }
+.podium-liczba.t5, .kg-liczba b.t5 { color: var(--t5); }

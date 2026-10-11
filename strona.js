@@ -93,11 +93,11 @@ function pigulki(aktywny) {
 function pokazRanking(kit) {
   if (kit !== 'ogolny' && !dane.rankingi[kit]) kit = 'ogolny';
   const ogolny = kit === 'ogolny';
-  // Jeden format dla obu widokow: liczba = punkty (Ogolny) albo ELO (kit).
+  // Jeden format dla obu widokow: liczba = punkty (Ogolny) albo tier (kit).
   // Kolejnosc rankingu (podium i numery miejsc) zawsze wg tieru/ELO; sortowanie zmienia tylko kolejnosc kart 4+.
   const wgRankingu = ogolny
     ? dane.ogolny.map((g, i) => ({ nick: g.nick, liczba: g.punkty, jednostka: 'pkt', tiery: g.tiery, miejsce: i + 1 }))
-    : dane.rankingi[kit].gracze.map((g, i) => ({ nick: g.nick, liczba: g.elo, jednostka: 'ELO', tier: g.tier, gr: g, miejsce: i + 1 }));
+    : dane.rankingi[kit].gracze.map((g, i) => ({ nick: g.nick, liczba: g.tier, jednostka: 'tier', tier: g.tier, gr: g, miejsce: i + 1 }));
   const reszta = ogolny ? wgRankingu.slice(3)
     : posortowane(wgRankingu.slice(3).map(g => ({ ...g.gr, _g: g }))).map(x => x._g);
   const gracze = wgRankingu.slice(0, 3).concat(reszta);
@@ -144,9 +144,8 @@ function podium(top) {
       el('img', { class: 'cialo', src: `https://mc-heads.net/body/${encodeURIComponent(g.nick)}/${i === 0 ? 150 : 120}`, alt: '', loading: 'lazy' }),
       el('div', { class: 'podium-nick' }, g.nick),
       el('div', { class: 'podium-opis' }, m.opis),
-      g.tier ? plakietkaTieru(g.tier) : null,
-      el('div', { class: 'podium-liczba num' }, g.liczba),
-      el('div', { class: 'podium-jedn' }, g.jednostka === 'pkt' ? 'punktów' : 'ELO'));
+      el('div', { class: 'podium-liczba ' + (g.tier ? tierKlasa(g.tier) : 'num') }, g.liczba),
+      el('div', { class: 'podium-jedn' }, g.jednostka === 'pkt' ? 'punktów' : 'tier'));
   }));
 }
 
@@ -159,9 +158,9 @@ function kartaGracza(g, miejsce) {
       el('div', { class: 'kg-tiery' }, g.tiery
         ? dane.kity.filter(k => g.tiery[k.klucz]).map(k => el('span', { class: 'kg-tier ' + tierKlasa(g.tiery[k.klucz]), title: k.nazwa },
           ikonaKitu(k.klucz), g.tiery[k.klucz]))
-        : [plakietkaTieru(g.tier), el('span', { class: 'num' }, el('span', { class: 'plus' }, g.gr.wygrane), ' / ',
+        : [el('span', { class: 'num' }, el('span', { class: 'plus' }, g.gr.wygrane), ' / ',
           el('span', { class: 'minus' }, g.gr.przegrane), ' · ' + Math.round(winrate(g.gr) * 100) + '%')])),
-    el('div', { class: 'kg-liczba' }, el('b', { class: 'num' }, g.liczba), el('span', {}, g.jednostka)));
+    el('div', { class: 'kg-liczba' }, el('b', { class: g.tier ? tierKlasa(g.tier) : 'num' }, g.liczba), el('span', {}, g.jednostka)));
 }
 
 const SORTY = [
