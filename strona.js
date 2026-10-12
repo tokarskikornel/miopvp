@@ -45,6 +45,7 @@ function odliczanie() {
   if (!ruch()) return;
   document.querySelectorAll('.podium-liczba').forEach((e, i) => {
     const cel = Number(e.textContent);
+    if (Number.isNaN(cel)) return; // tier (np. "HT3") nie jest liczba - zostaje bez odliczania
     const opoznienie = [450, 650, 300][i] ?? 400; // kolejnosc w HTML: 2., 1., 3. miejsce
     e.textContent = '0';
     const start = performance.now() + opoznienie;
@@ -103,7 +104,8 @@ function pokazRanking(kit) {
   const gracze = wgRankingu.slice(0, 3).concat(reszta);
   const wszystkich = Object.keys(dane.gracze).length;
 
-  tresc.replaceChildren(
+  // replaceChildren zamienia null na tekst "null" - puste czesci (np. brak listy przy <= 3 graczach) wyrzucamy.
+  tresc.replaceChildren(...[
     baner(ogolny ? 'Ogólny' : nazwaKitu(kit), gracze.length, wszystkich),
     pigulki(kit),
     gracze.length ? podium(gracze.slice(0, 3)) : el('div', { class: 'karta pusto' },
@@ -114,7 +116,7 @@ function pokazRanking(kit) {
     gracze.length > 3 ? kaskada(el('div', { class: 'karty-graczy' }, gracze.slice(3).map(g => kartaGracza(g, g.miejsce)))) : null,
     !ogolny && dane.rankingi[kit].kwalifikacje.length ? el('div', { class: 'karta uwaga-dol', style: 'margin-top:14px' }, 'W kwalifikacjach:',
       dane.rankingi[kit].kwalifikacje.map(k => el('span', {}, linkGracza(k.nick, 40), ' ',
-        el('span', { class: 'kwal' }, k.mecze + '/' + dane.progi.kwalifikacje)))) : null);
+        el('span', { class: 'kwal' }, k.mecze + '/' + dane.progi.kwalifikacje)))) : null].filter(Boolean));
 }
 
 function baner(nazwa, wRankingu, wszystkich) {
