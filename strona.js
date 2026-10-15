@@ -273,7 +273,7 @@ function pokazGracza(nick) {
         el('div', {}, el('b', {}, gl.najlepszaSeria), el('span', {}, 'Najl. seria')))),
     kity,
     el('div', { class: 'dwie' },
-      el('div', { class: 'karta wykres' }, el('p', { class: 'sekcja-tytul' }, 'Historia ELO'), przyciski, miejsceWykresu),
+      el('div', { class: 'karta wykres' }, el('p', { class: 'sekcja-tytul' }, 'Historia wygranych'), przyciski, miejsceWykresu),
       el('div', { class: 'karta lista' },
         el('p', { class: 'sekcja-tytul', style: 'margin-top:12px' }, 'Najczęstsi rywale'),
         g.rywale.length ? g.rywale.map(r => el('div', { class: 'w' }, linkGracza(r.nick, 44),
@@ -307,28 +307,14 @@ function svg(tag, atrybuty) {
   return e;
 }
 
-/** Linia ELO w czasie (kolejne walki rowno co punkt) + przerywane linie progow tierow w zakresie wykresu. */
+/** Wygrane Ranked narastajaco (kolejne walki rowno co punkt), os od 0. */
 function rysujWykres(punkty) {
   if (punkty.length < 2) return el('div', { class: 'pusto' }, 'Za mało walk na wykres.');
   const W = 600, H = 180, M = 8;
-  const elo = punkty.map(p => p[1]);
-  const min = Math.min(...elo) - 20, max = Math.max(...elo) + 20;
+  const max = Math.max(1, ...punkty.map(p => p[1]));
   const x = i => M + (i * (W - 2 * M)) / (punkty.length - 1);
-  const y = v => H - M - ((v - min) * (H - 2 * M)) / (max - min);
-  const s = svg('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none', role: 'img', 'aria-label': 'Wykres ELO' });
-
-  const { start, krok } = dane.progi;
-  const nazwy = ['LT5', 'MT5', 'HT5', 'LT4', 'MT4', 'HT4', 'LT3', 'MT3', 'HT3', 'LT2', 'MT2', 'HT2', 'LT1', 'MT1', 'HT1'];
-  const kolory = { 1: '#f5c542', 2: '#d5dbe6', 3: '#d39a62', 4: '#8f9bb3', 5: '#6f7a91' };
-  for (let i = 1; i < nazwy.length; i++) {
-    const prog = start + i * krok;
-    if (prog <= min || prog >= max) continue;
-    const kolor = kolory[nazwy[i].charAt(2)];
-    s.append(svg('line', { x1: 0, x2: W, y1: y(prog), y2: y(prog), stroke: kolor, 'stroke-opacity': '.3', 'stroke-dasharray': '4 6' }));
-    const t = svg('text', { x: W - 4, y: y(prog) - 4, fill: kolor, 'font-size': 11, 'text-anchor': 'end' });
-    t.textContent = nazwy[i];
-    s.append(t);
-  }
+  const y = v => H - M - (v * (H - 2 * M)) / max;
+  const s = svg('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none', role: 'img', 'aria-label': 'Wykres wygranych' });
   const d = punkty.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p[1]).toFixed(1)}`).join(' ');
   const grad = svg('linearGradient', { id: 'g', x1: 0, x2: 0, y1: 0, y2: 1 });
   grad.append(svg('stop', { offset: 0, 'stop-color': '#8f9bb3', 'stop-opacity': '.45' }), svg('stop', { offset: 1, 'stop-color': '#8f9bb3', 'stop-opacity': '0' }));
@@ -340,7 +326,7 @@ function rysujWykres(punkty) {
   const ost = punkty[punkty.length - 1];
   s.append(svg('circle', { cx: x(punkty.length - 1), cy: y(ost[1]), r: 4, fill: '#efeff1' }));
   return el('div', {}, s, el('div', { class: 'kiedy', style: 'text-align:left' },
-    `${punkty.length - 1} walk · teraz ${ost[1]} ELO`));
+    `${punkty.length - 1} walk · ${ost[1]} wygranych`));
 }
 
 // ---------- ROUTER I START ----------
