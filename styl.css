@@ -1,219 +1,331 @@
-/* Kolory jak na serwerze MIO PVP (tablica boczna, tiery w grze). Uklad inspirowany PvPHQ. */
+/* MIO PVP. Pomysl: ciecie mieczem z logo staje sie krawedzia strony - duze pole z naglowkiem jest sciete
+   tym samym skosem, a podium stoi na tej linii. Kwadratowe rogi (swiat z blokow), plaskie kolory,
+   jedna rodzina (Archivo z logo).
+   Kolory jak tablica boczna serwera (kity/scoreboard.py): wartosci #efeff1, etykiety #8e8e9a / #9d9daa,
+   ciemne #55555e - neutralne srebro, bez niebieskiego. Akcent = jasne srebro. Kolor maja tylko tiery (jak w grze). */
 :root {
-  --tlo: #101218; --karta: #1a1d27; --karta2: #20242f;
-  --linia: rgba(239,239,241,.07); --linia2: rgba(239,239,241,.13);
-  --wartosc: #efeff1; --etykieta: #8f9bb3; --cichy: #5d6680;
-  --t1: #f5c542; --t2: #d5dbe6; --t3: #d39a62; --t4: #8f9bb3; --t5: #6f7a91;
-  --plus: #7ee081; --minus: #ff6b6b;
+  --tlo: #0e0e11;
+  --pole: #19191e;               /* pole z naglowkiem (sciete) */
+  --pow1: #151518; --pow2: #1d1d22; --pow3: #28282e;
+  --atrament: #efeff1; --drugi: #9d9daa; --cichy: #8e8e9a; --ciemny: #55555e;
+  --akcent: #efeff1; --akcent-tekst: #0e0e11;
+  --t1: #f2c14e; --t2: #d9d9e0; --t3: #d49a63; --t4: #9d9daa; --t5: #6e6e78;
+  --plus: #6fd98a; --minus: #f27272;
+
+  /* Piec rozmiarow: maly, tekst, srodek, duzy, plakat. */
+  --s-maly: 14px; --s-tekst: 16px; --s-srodek: 22px; --s-duzy: 40px;
+  --s-plakat: clamp(46px, 9vw, 132px);
+
+  --skos: 110px;                 /* o ile prawa strona pola jest wyzej od lewej */
+  --kraniec: max(20px, calc((100vw - 1080px) / 2));
+
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --t-press: 140ms; --t-hover: 180ms;
 }
 * { box-sizing: border-box; }
+html { scrollbar-color: var(--ciemny) var(--tlo); overflow-x: clip; }
+::selection { background: var(--akcent); color: var(--akcent-tekst); }
 body {
-  margin: 0; min-height: 100vh; color: var(--etykieta);
-  font: 15px/1.5 Archivo, system-ui, sans-serif;
-  background: radial-gradient(1200px 500px at 50% -150px, #222838 0%, var(--tlo) 60%) fixed, var(--tlo);
+  margin: 0; min-height: 100svh; background: var(--tlo); color: var(--atrament);
+  font: 400 var(--s-tekst)/1.55 Archivo, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
 a { color: inherit; }
-.num { font-family: "JetBrains Mono", ui-monospace, monospace; }
-.wart { color: var(--wartosc); }
+:focus-visible { outline: 2px solid var(--akcent); outline-offset: 3px; }
+.num { font-variant-numeric: tabular-nums; }
+.wart { color: var(--atrament); }
 .plus { color: var(--plus); } .minus { color: var(--minus); }
+.maly { font-size: var(--s-maly); color: var(--cichy); }
 
-header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(14px); background: rgba(16,18,24,.78); border-bottom: 1px solid var(--linia); }
-.pasek { max-width: 1100px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 22px; }
+/* ---------- Naglowek: zwykly pasek, pelny kolor tla ---------- */
+header { position: sticky; top: 0; z-index: 5; background: var(--tlo); }
+.pasek { max-width: 1120px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; gap: 32px; }
 .logo { display: block; line-height: 0; flex-shrink: 0; }
 .logo svg { display: block; }
-nav a { color: var(--etykieta); text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: 13px; margin-right: 16px; }
-nav a.akt, nav a:hover { color: var(--wartosc); }
+nav { display: flex; gap: 22px; }
+nav a { position: relative; color: var(--drugi); text-decoration: none; font-weight: 600; padding: 6px 0; transition: color var(--t-hover); }
+nav a:hover, nav a.akt { color: var(--atrament); }
+nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--atrament);
+  transform: scaleX(0); transform-origin: left; transition: transform var(--t-hover) var(--ease-out); }
+nav a.akt::after { transform: scaleX(1); }
 .szukaj { margin-left: auto; }
-.szukaj input { background: var(--karta); border: 1px solid var(--linia2); border-radius: 10px; padding: 7px 12px; color: var(--wartosc);
-  min-width: 210px; font: inherit; font-size: 13px; outline: none; }
-.szukaj input:focus { border-color: var(--etykieta); }
+/* Pole formularza moze miec wlasna oprawe; tu tylko wypelnienie. */
+.szukaj input { background: var(--pow2); border: 0; border-radius: 0; padding: 10px 14px; color: var(--atrament);
+  width: 240px; font: inherit; font-size: 15px; outline: none; transition: background var(--t-hover); }
+.szukaj input::placeholder { color: var(--cichy); }
+.szukaj input:focus { background: var(--pow3); outline: 2px solid var(--akcent); outline-offset: 0; }
+.graj { flex-shrink: 0; font: inherit; font-weight: 800; cursor: pointer; color: var(--akcent-tekst); background: var(--akcent);
+  padding: 10px 18px; border: 0; border-radius: 0; transition: transform var(--t-press) var(--ease-out), background var(--t-hover); }
+.graj:hover { background: #ffffff; }
+.graj:active { transform: scale(.97); }
 
-main { max-width: 1100px; margin: 0 auto; padding: 8px 16px 60px; }
-h2 { color: var(--wartosc); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: 15px; margin: 32px 0 4px; }
-.pod { font-size: 13px; margin-bottom: 14px; }
-.info { text-align: center; padding: 60px 0; }
-.sekcja-tytul { color: var(--cichy); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; margin: 0 0 10px; }
-.karta { background: var(--karta); border: 1px solid var(--linia); border-radius: 18px; }
-.pusto { padding: 22px; text-align: center; font-size: 14px; }
+/* ---------- Ogolne ---------- */
+main { max-width: 1120px; margin: 0 auto; padding: 0 20px 160px; }
+h2 { font-size: var(--s-duzy); font-weight: 800; font-style: italic; letter-spacing: -.03em; line-height: 1; margin: 0 0 16px; }
+.pod { max-width: 60ch; margin: 0; }
+.info { padding: 120px 0; color: var(--drugi); }
+.sekcja-tytul { font-size: var(--s-srodek); font-weight: 800; letter-spacing: -.01em; line-height: 1.2; margin: 0 0 14px; }
+.karta { background: var(--pow1); }
+.pusto { padding: 32px 24px; color: var(--drugi); }
 
-.pigulki { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
-.pig { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--karta);
-  border: 1px solid var(--linia); color: var(--etykieta); font-weight: 600; font-size: 13px; text-decoration: none; cursor: pointer; }
-.pig img { width: 18px; height: 18px; image-rendering: pixelated; }
-.pig.akt { background: var(--karta2); border-color: var(--linia2); color: var(--wartosc); box-shadow: inset 0 -2px 0 var(--wartosc); }
-.pig:hover { color: var(--wartosc); }
-
-table { width: 100%; border-collapse: collapse; }
-th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--cichy); font-weight: 700;
-  padding: 12px 14px; border-bottom: 1px solid var(--linia); white-space: nowrap; }
-th.sortuj { cursor: pointer; user-select: none; }
-th.sortuj:hover, th.akt { color: var(--wartosc); }
-td { padding: 10px 14px; border-bottom: 1px solid var(--linia); }
-tr:last-child td { border-bottom: 0; }
-.miejsce { width: 48px; color: var(--cichy); font-weight: 700; }
-.m1 { color: var(--t1); } .m2 { color: var(--t2); } .m3 { color: var(--t3); }
-.gracz { display: inline-flex; align-items: center; gap: 10px; color: var(--wartosc); font-weight: 600; text-decoration: none; }
-.gracz:hover { text-decoration: underline; }
-.gracz img { width: 28px; height: 28px; border-radius: 6px; image-rendering: pixelated; }
-.tier { display: inline-block; padding: 2px 9px; border-radius: 7px; font-weight: 800; font-size: 12px; letter-spacing: .04em;
-  border: 1px solid currentColor; background: color-mix(in srgb, currentColor 12%, transparent); margin-right: 4px; }
+.gracz { display: inline-flex; align-items: center; gap: 10px; color: var(--atrament); font-weight: 600; text-decoration: none; }
+.gracz:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.gracz img { width: 28px; height: 28px; image-rendering: pixelated; }
+.tier { display: inline-block; padding: 2px 8px; font-weight: 800; font-size: var(--s-maly); background: color-mix(in srgb, currentColor 16%, transparent); margin-right: 4px; }
 .t1 { color: var(--t1); } .t2 { color: var(--t2); } .t3 { color: var(--t3); } .t4 { color: var(--t4); } .t5 { color: var(--t5); }
-.kwal { display: inline-block; padding: 2px 9px; border-radius: 7px; font-size: 12px; font-weight: 600; color: var(--etykieta); border: 1px dashed var(--linia2); }
-.uwaga-dol { padding: 12px 14px; font-size: 13px; border-top: 1px solid var(--linia); display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
-.uwaga-dol .gracz img { width: 22px; height: 22px; }
+.kwal { display: inline-block; padding: 2px 8px; font-size: var(--s-maly); font-weight: 600; color: var(--drugi); background: var(--pow3); }
+.uwaga-dol { padding: 18px 20px; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; color: var(--drugi); }
+.uwaga-dol .gracz img { width: 24px; height: 24px; }
 
-.mecz { display: grid; grid-template-columns: 90px 1fr 110px 1fr 90px; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--linia); }
-.mecz:last-child { border-bottom: 0; }
-.mecz .strona { display: flex; align-items: center; gap: 8px; }
-.mecz .strona.prawa { justify-content: flex-end; }
-.mecz .strona .gracz img { width: 24px; height: 24px; border-radius: 5px; }
-.przegrany { opacity: .55; }
-.wynik { text-align: center; color: var(--wartosc); font-weight: 800; font-size: 18px; }
-.wynik small { display: block; font-size: 11px; color: var(--cichy); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-family: Archivo, sans-serif; }
-.plak { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; }
-.plak.r { color: var(--t1); background: rgba(245,197,66,.1); border: 1px solid rgba(245,197,66,.35); }
-.plak.u { color: var(--etykieta); background: rgba(143,155,179,.08); border: 1px solid var(--linia2); }
-.kiedy { text-align: right; font-size: 12px; color: var(--cichy); }
+/* ---------- Kity (zakladki) ---------- */
+.pigulki { display: flex; flex-wrap: wrap; gap: 4px; margin: 16px 0 0; }
+.pig { display: inline-flex; align-items: center; gap: 9px; padding: 9px 14px; color: var(--drugi); background: var(--pow1);
+  font-weight: 600; text-decoration: none; transition: background var(--t-hover), color var(--t-hover), transform var(--t-press) var(--ease-out); }
+.pig img { width: 24px; height: 24px; image-rendering: pixelated; }
+.pig:hover { color: var(--atrament); background: var(--pow2); }
+.pig:active { transform: scale(.97); }
+.pig.akt { color: var(--tlo); background: var(--atrament); }
 
-.profil-top { display: flex; gap: 22px; align-items: center; padding: 22px; margin-top: 24px; }
-.profil-top > img { width: 96px; height: 96px; border-radius: 16px; image-rendering: pixelated; }
-.profil-top h3 { margin: 0; color: var(--wartosc); font-size: 30px; font-weight: 800; letter-spacing: .02em; }
-.staty { margin-left: auto; display: grid; grid-template-columns: repeat(4, auto); gap: 4px 26px; text-align: right; }
-.staty b { display: block; color: var(--wartosc); font-size: 20px; font-family: "JetBrains Mono", monospace; }
-.staty span { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--cichy); }
-.kity { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 14px 0; }
-.kit { padding: 14px; border-radius: 14px; background: var(--karta); border: 1px solid var(--linia); }
-.kit .naz { display: flex; align-items: center; gap: 8px; color: var(--etykieta); font-weight: 600; font-size: 13px; margin-bottom: 10px; }
-.kit .naz img { width: 24px; height: 24px; image-rendering: pixelated; }
-.kit .elo { margin-top: 6px; font-size: 12px; }
-.dwie { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; }
-.wykres { padding: 16px; }
-.wykres svg { width: 100%; height: 190px; display: block; }
-.lista { padding: 6px 16px; }
-.lista .w { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--linia); font-size: 14px; flex-wrap: wrap; }
-.lista .w:last-child { border-bottom: 0; }
-.lista .w .gracz img { width: 22px; height: 22px; border-radius: 5px; }
-.lista .w .prawo { margin-left: auto; text-align: right; }
-.mini-pig { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
-.mini-pig button { font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--linia); background: none; color: var(--etykieta); cursor: pointer; }
-.mini-pig button.akt { color: var(--wartosc); border-color: var(--linia2); background: var(--karta2); }
+/* ---------- Pole z naglowkiem: na cala szerokosc, dol sciety jak w logo ---------- */
+.baner, .profil-top {
+  position: relative; margin: 16px calc(50% - 50vw) 0; padding: 56px var(--kraniec) calc(var(--skos) + 64px);
+  background: var(--pole);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--skos)), 0 100%);
+  display: flex; align-items: flex-end; gap: 32px;
+}
+.baner h1 { margin: 0 0 18px; font-size: var(--s-plakat); font-weight: 900; font-style: italic; letter-spacing: -.04em; line-height: .92; }
+.baner-liczba { margin-left: auto; text-align: right; flex-shrink: 0; padding-bottom: 4px; }
+.baner-liczba b { display: block; font-size: var(--s-duzy); font-weight: 900; font-style: italic; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.baner-liczba span { color: var(--drugi); }
 
-footer { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  font-size: 13px; color: var(--cichy); border-top: 1px solid var(--linia); }
-.kopiuj { color: var(--wartosc); background: none; border: 1px solid var(--linia2); border-radius: 8px; padding: 3px 10px; margin-left: 8px; font: inherit; cursor: pointer; }
-
-/* ---------- Ranking: baner, podium, karty (inspiracja: PvPHQ "Overall Ladder") ---------- */
-.baner { margin-top: 24px; padding: 30px 26px; border-radius: 20px; border: 1px solid var(--linia2); display: flex; align-items: flex-end; gap: 20px;
-  background:
-    radial-gradient(600px 220px at 85% 0%, rgba(143,155,179,.22), transparent 70%),
-    repeating-linear-gradient(90deg, rgba(239,239,241,.025) 0 1px, transparent 1px 32px),
-    repeating-linear-gradient(0deg, rgba(239,239,241,.025) 0 1px, transparent 1px 32px),
-    linear-gradient(135deg, #1d2130, #12141b); }
-.baner h1 { margin: 2px 0 6px; color: var(--wartosc); font-size: clamp(30px, 5vw, 46px); font-weight: 800; letter-spacing: -.01em; line-height: 1.05; }
-.akcent { background: linear-gradient(90deg, #efeff1, #8f9bb3); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.baner-liczba { margin-left: auto; text-align: right; }
-.baner-liczba b { display: block; color: var(--wartosc); font-size: 26px; }
-.baner-liczba span { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: var(--cichy); font-weight: 700; }
-.baner-liczba small { font-size: 12px; color: var(--cichy); }
-
-.pigulki { margin-top: 18px; padding-bottom: 8px; border-bottom: 2px solid var(--linia); }
-.pig { padding: 10px 18px; font-size: 14px; }
-.pig img { width: 28px; height: 28px; }
-.pig.akt { background: linear-gradient(180deg, #efeff1, #b9c1d3); color: #12141b; border-color: transparent; box-shadow: 0 4px 18px rgba(239,239,241,.18); }
-
-.podium { display: grid; grid-template-columns: 1fr 1.05fr 1fr; gap: 18px; align-items: end; margin: 60px 0 26px; }
-.podium-karta { --kolor: var(--t2); position: relative; display: flex; flex-direction: column; align-items: center; text-decoration: none;
-  padding: 40px 16px 20px; border-radius: 18px; border: 1.5px solid color-mix(in srgb, var(--kolor) 70%, transparent);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--kolor) 9%, var(--karta)), #13151c);
-  box-shadow: 0 0 34px color-mix(in srgb, var(--kolor) 16%, transparent), inset 0 1px 0 rgba(255,255,255,.06); transition: translate .2s; }
-.podium-karta:hover { translate: 0 -4px; }
-.podium-karta.p1 { --kolor: var(--t1); padding-top: 52px; padding-bottom: 26px; }
+/* ---------- Podium: stoi na linii ciecia ---------- */
+.podium { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 4px; align-items: end;
+  margin: calc(-1 * var(--skos) - 40px) 0 48px; }
+.podium-karta { --kolor: var(--t2); position: relative; display: grid; justify-items: center; text-decoration: none;
+  padding: 28px 16px 26px; background: var(--pow1); transition: background var(--t-hover), translate var(--t-hover) var(--ease-out); }
+.podium-karta:hover { background: var(--pow2); translate: 0 -4px; }
+.podium-karta.p1 { --kolor: var(--t1); padding-top: 36px; padding-bottom: 32px; background: var(--pow2); }
+.podium-karta.p1:hover { background: var(--pow3); }
 .podium-karta.p2 { --kolor: var(--t2); }
 .podium-karta.p3 { --kolor: var(--t3); }
-.cialo { height: 120px; image-rendering: pixelated; filter: drop-shadow(0 10px 10px rgba(0,0,0,.45)); margin-bottom: 12px; }
-.p1 .cialo { height: 150px; }
-.podium-nick { color: var(--wartosc); font-size: 19px; font-weight: 700; }
-.p1 .podium-nick { font-size: 22px; }
-.podium-opis { color: var(--kolor); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; margin: 2px 0 8px; }
-.podium-liczba { color: var(--wartosc); font-size: 30px; font-weight: 800; line-height: 1.1; margin-top: 6px; }
-.p1 .podium-liczba { font-size: 36px; }
-.podium-jedn { font-size: 10px; text-transform: uppercase; letter-spacing: .16em; color: var(--cichy); font-weight: 700; }
-.odznaka { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); width: 46px; height: 50px; display: grid; place-items: center;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--kolor) 100%, white 25%), color-mix(in srgb, var(--kolor) 70%, black)); }
-.odznaka span { color: #15171e; font-weight: 800; font-size: 20px; font-family: "JetBrains Mono", monospace; }
-.odznaka.szesciokat { clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
-.odznaka.tarcza { clip-path: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%); }
-.odznaka.gwiazda { top: -34px; width: 64px; height: 62px; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
-.odznaka.gwiazda span { margin-top: 6px; }
-.p1::before { content: "♛"; position: absolute; top: -66px; left: 50%; transform: translateX(-50%); color: var(--t1); font-size: 26px; text-shadow: 0 0 14px rgba(245,197,66,.5); }
+/* Pasek w kolorze miejsca na gorze karty - wypelniony ksztalt, nie linia. */
+.podium-karta::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 6px; background: var(--kolor); }
+.podium-miejsce { justify-self: start; color: var(--kolor); font-size: var(--s-duzy); font-weight: 900; font-style: italic; line-height: 1; margin: -6px 0 -18px; }
+.cialo { height: 150px; image-rendering: pixelated; margin-bottom: 18px; }
+.p1 .cialo { height: 210px; }
+.podium-nick { font-size: var(--s-srodek); font-weight: 800; letter-spacing: -.01em; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.podium-liczba { display: inline; font-size: var(--s-duzy); font-weight: 900; font-style: italic; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.podium-jedn { color: var(--drugi); font-size: var(--s-maly); }
+/* Wolne miejsce: ta sama karta, bez skina; zaprasza do kwalifikacji. */
+.podium-karta.wolne { background: var(--pow1); align-content: end; min-height: 230px; }
+.podium-karta.wolne::before { opacity: .35; }
+.podium-karta.wolne .podium-miejsce { opacity: .5; }
+.podium-karta.wolne .podium-nick { color: var(--drugi); margin-top: 48px; }
+.wolne-opis { color: var(--cichy); font-size: var(--s-maly); text-align: center; max-width: 26ch; margin: 6px 0 0; }
 
-.lista-pasek { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13px; margin: 6px 0 10px; }
-.karty-graczy { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.karta-gracza { display: flex; align-items: center; gap: 14px; padding: 10px 16px 10px 0; text-decoration: none; border-radius: 14px;
-  background: var(--karta); border: 1px solid var(--linia); border-left: 3px solid var(--linia2); transition: border-color .15s; }
-.karta-gracza:hover { border-color: var(--linia2); }
-.kg-miejsce { width: 56px; text-align: center; color: var(--cichy); font-size: 20px; font-weight: 700; align-self: stretch; display: grid; place-items: center; border-right: 1px solid var(--linia); }
-.karta-gracza > img { width: 44px; height: 44px; border-radius: 8px; image-rendering: pixelated; }
+/* Blisko tieru: kto jest w kwalifikacjach */
+.blisko { margin-top: 96px; }
+.blisko .pod { margin-bottom: 20px; }
+.blisko-kity { display: flex; gap: 16px; flex-wrap: wrap; justify-content: flex-end; color: var(--drugi); font-size: 15px; }
+
+/* ---------- Lista graczy (miejsca 4+): wiersze tabeli rankingu ---------- */
+.lista-pasek { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; color: var(--drugi); margin: 0 0 12px; }
+.karty-graczy { display: flex; flex-direction: column; gap: 2px; }
+.karta-gracza { display: grid; grid-template-columns: 64px 44px 1fr auto; align-items: center; gap: 16px; padding: 10px 24px 10px 0;
+  text-decoration: none; background: var(--pow1); transition: background var(--t-hover), translate var(--t-hover) var(--ease-out); }
+.karta-gracza:hover { background: var(--pow2); translate: 4px 0; }
+.kg-miejsce { text-align: center; color: var(--drugi); font-size: var(--s-srodek); font-weight: 800; font-style: italic; }
+.karta-gracza > img { width: 44px; height: 44px; image-rendering: pixelated; }
 .kg-srodek { min-width: 0; }
-.kg-nick { color: var(--wartosc); font-weight: 700; font-size: 16px; }
-.kg-tiery { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 12px; margin-top: 2px; }
-.kg-tier { display: inline-flex; align-items: center; gap: 3px; font-weight: 800; }
-.kg-tier img { width: 20px; height: 20px; image-rendering: pixelated; }
-.kg-liczba { margin-left: auto; text-align: right; }
-.kg-liczba b { display: block; color: var(--wartosc); font-size: 22px; }
-.kg-liczba span { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: var(--cichy); font-weight: 700; }
+.kg-nick { font-weight: 800; }
+.kg-tiery { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; font-size: var(--s-maly); color: var(--drugi); margin-top: 2px; }
+.kg-tier { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; }
+.kg-tier img { width: 18px; height: 18px; image-rendering: pixelated; }
+.kg-liczba { text-align: right; }
+.kg-liczba b { font-size: var(--s-srodek); font-weight: 900; font-style: italic; font-variant-numeric: tabular-nums; }
+.kg-liczba span { color: var(--drugi); font-size: var(--s-maly); margin-left: 6px; }
+.mini-pig { display: flex; gap: 4px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.mini-pig button { font: inherit; font-size: 15px; font-weight: 600; padding: 7px 12px; border: 0; border-radius: 0; background: var(--pow1); color: var(--drugi); cursor: pointer;
+  transition: color var(--t-hover), background var(--t-hover), transform var(--t-press) var(--ease-out); }
+.mini-pig button:hover { color: var(--atrament); background: var(--pow2); }
+.mini-pig button:active { transform: scale(.97); }
+.mini-pig button.akt { color: var(--tlo); background: var(--atrament); }
 
-/* ---------- Animacje (wylaczone przy "ogranicz ruch") ---------- */
-@keyframes wjazd { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+/* ---------- Mecze ---------- */
+.mecze { display: flex; flex-direction: column; gap: 2px; margin-top: calc(-1 * var(--skos) + 24px); position: relative; z-index: 1; }
+.mecz { display: grid; grid-template-columns: 100px 1fr 130px 1fr 100px; align-items: center; gap: 12px; padding: 14px 20px; background: var(--pow1); transition: background var(--t-hover); }
+.mecz:hover { background: var(--pow2); }
+.mecz .strona { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.mecz .strona.prawa { justify-content: flex-end; }
+.przegrany { opacity: .55; }
+.wynik { text-align: center; font-size: var(--s-srodek); font-weight: 900; font-style: italic; line-height: 1.1; }
+.wynik small { display: block; font-size: var(--s-maly); color: var(--drugi); font-weight: 600; }
+.plak { display: inline-block; font-size: var(--s-maly); font-weight: 700; padding: 3px 8px; }
+.plak.r { color: var(--akcent-tekst); background: var(--atrament); }
+.plak.u { color: var(--drugi); background: var(--pow3); }
+.kiedy { text-align: right; font-size: 15px; color: var(--drugi); }
+
+/* ---------- Profil ---------- */
+.profil-top { align-items: center; flex-wrap: wrap; }
+.profil-top > img { width: 128px; height: 128px; image-rendering: pixelated; }
+.profil-top h1 { margin: 0 0 8px; font-size: clamp(40px, 7vw, 96px); font-weight: 900; font-style: italic; letter-spacing: -.04em; line-height: .95; overflow-wrap: anywhere; }
+.staty { margin-left: auto; display: grid; grid-template-columns: repeat(4, auto); gap: 8px 40px; }
+.staty b { display: block; font-size: var(--s-duzy); font-weight: 900; font-style: italic; letter-spacing: -.03em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.staty span { color: var(--drugi); }
+/* Kity gracza: tabela w dwoch kolumnach - kit, tier, ELO i bilans w jednym wierszu. */
+.kity { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 4px; margin: calc(-1 * var(--skos) + 16px) 0 64px; }
+.kit { display: grid; grid-template-columns: 1fr auto 150px; align-items: center; gap: 16px; padding: 14px 20px; background: var(--pow1); transition: background var(--t-hover); }
+.kit:hover { background: var(--pow2); }
+.kit .naz { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+.kit .naz img { width: 28px; height: 28px; image-rendering: pixelated; }
+.kit .elo { text-align: right; color: var(--drugi); }
+.dwie { display: grid; grid-template-columns: 1.6fr 1fr; gap: 32px; margin-bottom: 64px; }
+.wykres { padding: 24px; }
+.wykres svg { width: 100%; height: 200px; display: block; }
+.wykres svg path { stroke: var(--akcent); }
+.wykres svg path:first-of-type { stroke: none; fill: var(--akcent); }
+.wykres svg circle { fill: var(--akcent); }
+.wykres .kiedy { text-align: left; margin-top: 10px; }
+.lista { display: flex; flex-direction: column; gap: 2px; }
+.lista .w { display: flex; align-items: center; gap: 10px; padding: 12px 18px; background: var(--pow1); flex-wrap: wrap; }
+.lista .w .gracz img { width: 24px; height: 24px; }
+.lista .w .prawo { margin-left: auto; text-align: right; }
+.lista .w .kiedy, .lista .w .plak { font-size: 15px; }
+
+/* ---------- Stopka: adres serwera na cala szerokosc ---------- */
+footer { background: var(--pole); padding: 96px var(--kraniec) 40px; }
+.stopka-zach { color: var(--drugi); font-size: var(--s-srodek); margin: 0 0 8px; }
+.adres { display: block; width: 100%; white-space: nowrap; text-align: left; padding: 0; border: 0; background: none; cursor: pointer; color: var(--atrament);
+  font: 900 italic clamp(48px, 12.5vw, 184px)/.9 Archivo, system-ui, sans-serif; letter-spacing: -.05em; transition: color var(--t-hover); }
+.adres:hover { color: #ffffff; }
+.adres:active { transform: scale(.99); }
+.stopka-dol { display: flex; justify-content: space-between; gap: 8px 24px; flex-wrap: wrap; margin-top: 48px; color: var(--drugi); }
+
+/* ---------- Ruch (tylko gdy system pozwala) ---------- */
+@keyframes wjazd { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 @keyframes pojaw { from { opacity: 0; } to { opacity: 1; } }
-@keyframes wyskok { 0% { transform: translateX(-50%) scale(0) rotate(-20deg); } 70% { transform: translateX(-50%) scale(1.15) rotate(4deg); } 100% { transform: translateX(-50%) scale(1); } }
-@keyframes korona { 0%, 100% { text-shadow: 0 0 10px rgba(245,197,66,.35); transform: translateX(-50%) translateY(0); }
-  50% { text-shadow: 0 0 22px rgba(245,197,66,.85); transform: translateX(-50%) translateY(-3px); } }
-@keyframes blask { 0%, 100% { box-shadow: 0 0 30px color-mix(in srgb, var(--kolor) 14%, transparent), inset 0 1px 0 rgba(255,255,255,.06); }
-  50% { box-shadow: 0 0 46px color-mix(in srgb, var(--kolor) 30%, transparent), inset 0 1px 0 rgba(255,255,255,.08); } }
-@keyframes bujanie { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+@keyframes ciecie { from { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); } to { clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--skos)), 0 100%); } }
+@keyframes pasek { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes oddech { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes wstan { from { opacity: 0; transform: translateY(48px); } to { opacity: 1; transform: none; } }
+@keyframes skok { 0%, 100% { transform: none; } 40% { transform: translateY(-4px) rotate(-10deg); } }
+@keyframes litera { from { opacity: 0; transform: translateY(60%) skewX(-8deg); } to { opacity: 1; transform: none; } }
+@keyframes tetno { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.8); opacity: .5; } }
 @keyframes rysuj { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+/* Logo: miecz przecina napis od lewej, dolna polowa zsuwa sie po cieciu. */
+@keyframes logo-ciecie { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes logo-zsun { from { translate: -3px -2px; } to { translate: 0 0; } }
+@keyframes logo-czubek { 0%, 60% { opacity: 0; } 100% { opacity: 1; } }
+
+.baner h1, .profil-top h1 { translate: 0 var(--paralaksa, 0); }
+.litera { display: inline-block; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .widok { animation: pojaw .35s ease-out; }
-  .baner { animation: wjazd .5s cubic-bezier(.16,1,.3,1); }
-  .podium-karta { opacity: 0; animation: wjazd .7s cubic-bezier(.16,1,.3,1) forwards; }
-  .podium-karta.p3 { animation-delay: .1s; }
-  .podium-karta.p2 { animation-delay: .25s; }
-  .podium-karta.p1 { animation: wjazd .8s cubic-bezier(.16,1,.3,1) .4s forwards, blask 3.5s ease-in-out 1.3s infinite; }
-  .odznaka { animation: wyskok .55s cubic-bezier(.34,1.56,.64,1) backwards; animation-delay: inherit; }
-  .p3 .odznaka { animation-delay: .45s; } .p2 .odznaka { animation-delay: .6s; } .p1 .odznaka { animation-delay: .85s; }
-  .p1::before { animation: korona 2.6s ease-in-out 1.2s infinite; }
-  .podium-karta:hover .cialo { animation: bujanie .8s ease-in-out; }
-  .kaskada > * { opacity: 0; animation: wjazd .45s cubic-bezier(.16,1,.3,1) forwards; animation-delay: calc(var(--i, 0) * 45ms + .15s); }
-  .karta-gracza, .kit, .mecz { transition: transform .15s, border-color .15s, box-shadow .15s; }
-  .karta-gracza:hover, .kit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
-  .pig { transition: background .2s, color .2s, box-shadow .2s, transform .15s; }
-  .pig:hover { transform: translateY(-1px); }
-  .wykres svg { animation: rysuj 1.3s cubic-bezier(.45,0,.2,1) .15s backwards; }
+  .widok { animation: pojaw .3s ease-out; }
 
+  .logo-ciecie { stroke-dasharray: 1; animation: logo-ciecie .55s cubic-bezier(.7, 0, .2, 1) .15s both; }
+  .logo-czubek { animation: logo-czubek .7s ease-out .15s both; }
+  .logo-dol { animation: logo-zsun .45s var(--ease-out) .6s both; transition: translate var(--t-hover) var(--ease-out); }
+  .logo:hover .logo-dol { translate: 2px 1px; }
+
+  /* Ruch znakowy: pole odslania sie jak ciecie, od lewej do prawej, potem wjezdza tresc. */
+  .baner, .profil-top { animation: ciecie .8s var(--ease-out) both; }
+  .baner > *, .profil-top > * { animation: wjazd .7s var(--ease-out) both; }
+  .baner > :nth-child(1), .profil-top > :nth-child(1) { animation-delay: .2s; }
+  .baner > :nth-child(2), .profil-top > :nth-child(2) { animation-delay: .3s; }
+  .baner > :nth-child(3), .profil-top > :nth-child(3) { animation-delay: .4s; }
+
+  /* Podium: karty wjezdzaja, pasek miejsca sie rysuje, skin wstaje zza linii ciecia. */
+  .podium-karta { overflow: hidden; animation: wjazd .7s var(--ease-out) both; }
+  .podium-karta.p1 { animation-delay: .4s; }
+  .podium-karta.p2 { animation-delay: .5s; }
+  .podium-karta.p3 { animation-delay: .6s; }
+  .podium-karta::before { transform-origin: left; animation: pasek .6s var(--ease-out) both; animation-delay: inherit; }
+  .cialo { animation: wstan .8s var(--ease-out) both; animation-delay: calc(.25s + var(--d, .5s)); }
+  .p1 .cialo { --d: .4s; animation: wstan .8s var(--ease-out) .65s both, oddech 4.5s ease-in-out 1.6s infinite; }
+  .p3 .cialo { --d: .6s; }
+  .cialo { transition: rotate .3s var(--ease-out), scale .3s var(--ease-out); }
+  .podium-karta:hover .cialo { rotate: -5deg; scale: 1.05; }
+
+  /* Listy: wiersze wjezdzaja, kiedy wchodza w ekran. */
+  .kaskada > * { animation: wjazd .55s var(--ease-out) both paused; animation-delay: calc(var(--i, 0) * 60ms); }
+  .kaskada > .widac { animation-play-state: running; }
+  .pigulki.kaskada > * { animation-name: pojaw; animation-duration: .4s; animation-delay: calc(var(--i, 0) * 35ms); }
+  .wjazd { animation: wjazd .6s var(--ease-out) both paused; }
+  .wjazd.widac { animation-play-state: running; }
+
+  /* Odpowiedz pod reka */
+  .pig:hover img, .kit:hover .naz img { animation: skok .45s var(--ease-out); }
+  .gracz img, .karta-gracza > img { transition: transform var(--t-hover) var(--ease-out); }
+  .gracz:hover img, .karta-gracza:hover > img, .lista .w:hover .gracz img { transform: scale(1.12) rotate(-4deg); }
+  .lista .w, .mecz { transition: background var(--t-hover), translate var(--t-hover) var(--ease-out); }
+  .lista .w:hover, .mecz:hover { translate: 4px 0; }
+  .tier, .plak { transition: transform var(--t-press) var(--ease-out); }
+  .kit:hover .tier, .lista .w:hover .plak { transform: scale(1.08); }
+
+  /* Wykres rysuje sie od lewej, ostatni punkt pulsuje. */
+  .wykres svg { animation: rysuj 1.2s cubic-bezier(.45, 0, .2, 1) .2s backwards; }
+  .wykres svg circle { transform-box: fill-box; transform-origin: center; animation: tetno 2s ease-in-out 1.4s infinite; }
+
+  /* Stopka: litery adresu wchodza fala, przy najechaniu podskakuja po kolei. */
+  .adres .litera { transition: transform .3s var(--ease-out); transition-delay: calc(var(--l) * 25ms); }
+  .adres.wjazd { animation: none; }
+  .adres.wjazd .litera { animation: litera .7s var(--ease-out) both paused; animation-delay: calc(var(--l) * 45ms); }
+  .adres.wjazd.widac .litera { animation-play-state: running; }
+  .adres:hover .litera { transform: translateY(-8%); }
+  .skopiowano { animation: pojaw .25s ease-out; }
 }
 
-@media (max-width: 760px) {
-  .baner { flex-direction: column; align-items: flex-start; } .baner-liczba { margin-left: 0; text-align: left; }
-  .podium { grid-template-columns: 1fr; gap: 40px; margin-top: 50px; }
-  .podium-karta.p1 { order: -1; }
-  .karty-graczy { grid-template-columns: 1fr; }
-  .pasek { gap: 12px; flex-wrap: wrap; }
-  .szukaj { margin-left: 0; width: 100%; } .szukaj input { width: 100%; }
-  .kity { grid-template-columns: repeat(2, 1fr); } .dwie { grid-template-columns: 1fr; }
-  .profil-top { flex-wrap: wrap; } .staty { margin-left: 0; text-align: left; grid-template-columns: repeat(2, auto); }
-  .mecz { grid-template-columns: 1fr; text-align: center; } .mecz .strona, .mecz .strona.prawa { justify-content: center; } .kiedy { text-align: center; }
-  .ukryj-tel { display: none; }
-  td, th { padding: 8px 8px; }
+/* ---------- Telefon i tablet: wlasny uklad ---------- */
+@media (max-width: 860px) {
+  :root { --skos: 56px; }
+  .pasek { gap: 12px 18px; flex-wrap: wrap; padding: 12px 16px; }
+  .graj { margin-left: auto; }
+  .szukaj { order: 4; margin-left: 0; width: 100%; } .szukaj input { width: 100%; }
+  .podium-karta.wolne { min-height: 170px; }
+  .podium-karta.wolne .podium-nick { margin-top: 24px; }
+  .wolne-opis { display: none; }
+  .podium-karta.wolne .podium-nick { white-space: normal; text-align: center; }
+  .kity { grid-template-columns: 1fr; }
+  .kit { grid-template-columns: 1fr auto; padding: 12px 16px; }
+  .kit .elo { grid-column: 1 / -1; text-align: left; margin-top: -8px; }
+  .blisko { margin-top: 64px; }
+  main { padding: 0 16px 120px; }
+  .baner, .profil-top { flex-direction: column; align-items: flex-start; gap: 20px; padding-top: 40px; padding-bottom: calc(var(--skos) + 48px); }
+  .baner-liczba { margin-left: 0; text-align: left; }
+  .podium { gap: 3px; grid-template-columns: 1fr 1.12fr 1fr; }
+  .podium-karta { padding: 20px 6px 18px; }
+  .podium-karta.p1 { padding-top: 24px; }
+  .podium-miejsce { font-size: var(--s-srodek); margin: -6px 0 -10px 4px; }
+  .cialo { height: 92px; margin-bottom: 10px; } .p1 .cialo { height: 124px; }
+  .podium-nick { font-size: 15px; }
+  .podium-liczba { font-size: 28px; }
+  .karta-gracza { grid-template-columns: 44px 36px 1fr auto; gap: 10px; padding-right: 14px; }
+  .karta-gracza > img { width: 36px; height: 36px; }
+  .dwie { grid-template-columns: 1fr; }
+  .staty { margin-left: 0; grid-template-columns: repeat(2, auto); gap: 12px 40px; }
+  .profil-top > img { width: 88px; height: 88px; }
+  .mecz { grid-template-columns: 1fr auto 1fr; gap: 8px 12px; padding: 14px 16px; }
+  .mecz > :first-child { grid-column: 1 / -1; }
+  .mecz .kiedy { grid-column: 1 / -1; text-align: left; }
+  .mecz .strona { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .mecz .strona.prawa { flex-direction: column-reverse; align-items: flex-end; }
+  footer { padding-top: 72px; }
 }
 
-/* Sortowanie w kicie: podium i baner zostaja na miejscu, tasuja sie tylko karty. */
-.cisza .baner, .cisza .podium-karta, .cisza .odznaka, .cisza .p1::before { animation: none !important; opacity: 1; }
+/* Sortowanie w kicie: pole i podium zostaja na miejscu, tasuja sie tylko wiersze. */
+.cisza .baner, .cisza .baner > *, .cisza .podium-karta, .cisza .podium-karta::before, .cisza .cialo, .cisza .pigulki > * { animation: none !important; }
 
-/* Ranking kitu pokazuje tier zamiast ELO - kolor tieru ma wygrac z kolorem liczby. */
+/* Ranking kitu pokazuje tier zamiast liczby - kolor tieru wygrywa. */
 .podium-liczba.t1, .kg-liczba b.t1 { color: var(--t1); }
 .podium-liczba.t2, .kg-liczba b.t2 { color: var(--t2); }
 .podium-liczba.t3, .kg-liczba b.t3 { color: var(--t3); }
 .podium-liczba.t4, .kg-liczba b.t4 { color: var(--t4); }
 .podium-liczba.t5, .kg-liczba b.t5 { color: var(--t5); }
+
+/* Telefon: logo i "Graj" w pierwszym rzedzie, nawigacja i szukajka w drugim. */
+@media (max-width: 560px) {
+  .graj { order: 2; padding: 9px 14px; }
+  nav { order: 3; }
+  .szukaj { flex: 1; width: auto; min-width: 0; }
+}
