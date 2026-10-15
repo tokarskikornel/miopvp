@@ -473,7 +473,7 @@ function pokazGracza(nick) {
         el('div', {}, el('b', {}, gl.najlepszaSeria), el('span', {}, 'Best streak')))),
     kity,
     el('div', { class: 'dwie' },
-      el('div', { class: 'karta wykres' }, el('h2', { class: 'sekcja-tytul' }, 'Wins over time'), przyciski, miejsceWykresu),
+      el('div', { class: 'karta wykres' }, el('h2', { class: 'sekcja-tytul' }, 'Wins and losses'), przyciski, miejsceWykresu),
       kaskada(el('div', { class: 'lista' },
         el('h2', { class: 'sekcja-tytul' }, 'Top rivals'),
         g.rywale.length ? g.rywale.map(r => el('div', { class: 'w' }, linkGracza(r.nick, 44),
@@ -509,22 +509,31 @@ function svg(tag, atrybuty) {
   return e;
 }
 
-/** Wygrane Ranked narastajaco (kolejne walki rowno co punkt), os od 0. */
+/**
+ * Wygrane i przegrane Ranked narastajaco (kolejne walki rowno co punkt), os od 0.
+ * Eksport daje tylko wygrane: punkt i = po i walkach, wiec przegrane = i - wygrane (remis liczy sie jak przegrana).
+ */
 function rysujWykres(punkty) {
   if (punkty.length < 2) return el('div', { class: 'pusto' }, 'Not enough fights for a chart.');
   const W = 600, H = 180, M = 8;
-  const max = Math.max(1, ...punkty.map(p => p[1]));
+  const wygrane = punkty.map(p => p[1]);
+  const przegrane = punkty.map((p, i) => i - p[1]);
+  const max = Math.max(1, ...wygrane, ...przegrane);
   const x = i => M + (i * (W - 2 * M)) / (punkty.length - 1);
   const y = v => H - M - (v * (H - 2 * M)) / max;
-  const s = svg('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none', role: 'img', 'aria-label': 'Wins chart' });
-  const d = punkty.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p[1]).toFixed(1)}`).join(' ');
+  const linia = wartosci => wartosci.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const s = svg('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none', role: 'img', 'aria-label': 'Wins and losses chart' });
+  const ost = punkty.length - 1;
   s.append(
-    svg('path', { d: `${d} L${x(punkty.length - 1)},${H} L${x(0)},${H} Z`, opacity: '.12' }),
-    svg('path', { d, fill: 'none', stroke: '#efeff1', 'stroke-width': 2.5, 'vector-effect': 'non-scaling-stroke' }));
-  const ost = punkty[punkty.length - 1];
-  s.append(svg('circle', { cx: x(punkty.length - 1), cy: y(ost[1]), r: 4, fill: '#efeff1' }));
-  return el('div', {}, s, el('div', { class: 'kiedy', style: 'text-align:left' },
-    `${punkty.length - 1} fights · ${ost[1]} wins`));
+    svg('path', { class: 'linia-p', d: linia(przegrane), fill: 'none', 'stroke-width': 2.5, 'vector-effect': 'non-scaling-stroke' }),
+    svg('path', { class: 'linia-w', d: linia(wygrane), fill: 'none', 'stroke-width': 2.5, 'vector-effect': 'non-scaling-stroke' }),
+    svg('circle', { class: 'punkt-p', cx: x(ost), cy: y(przegrane[ost]), r: 4 }),
+    svg('circle', { class: 'punkt-w', cx: x(ost), cy: y(wygrane[ost]), r: 4 }));
+  const w = wygrane[ost], p = przegrane[ost];
+  return el('div', {}, s, el('div', { class: 'legenda' },
+    el('span', {}, ost + ' fights'),
+    el('span', { class: 'leg-w' }, w + (w === 1 ? ' win' : ' wins')),
+    el('span', { class: 'leg-p' }, p + (p === 1 ? ' loss' : ' losses'))));
 }
 
 // ---------- ROUTER I START ----------
