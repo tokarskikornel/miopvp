@@ -35,11 +35,13 @@
     <nav>
       <a id="nav-ranking" href="#ranking/ogolny">Rankings</a>
       <a id="nav-mecze" href="#mecze">Matches</a>
+      <a id="nav-tiery" href="#tiery">Tiers</a>
     </nav>
     <form id="szukaj" class="szukaj" autocomplete="off">
-      <input id="szukaj-pole" list="nicki" placeholder="Find a player…" aria-label="Find a player">
+      <input id="szukaj-pole" list="nicki" placeholder="Find a player (press /)" aria-label="Find a player">
       <datalist id="nicki"></datalist>
     </form>
+    <span class="online" hidden></span>
     <button class="graj kopiuj-adres" type="button" title="Copy the server address">Play: miopvp.com</button>
   </div>
 </header>
@@ -47,7 +49,7 @@
 <main id="tresc"><p class="info">Loading…</p></main>
 
 <footer>
-  <p class="stopka-zach">Join the server. Click the address to copy it.</p>
+  <p class="stopka-zach">Join the server. Click the address to copy it. <span class="online" hidden></span></p>
   <button class="adres kopiuj-adres" type="button" aria-label="Copy the server address miopvp.com">miopvp.com</button>
   <div class="stopka-dol">
     <span id="zaktualizowano"></span>

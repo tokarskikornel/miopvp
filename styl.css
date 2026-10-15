@@ -169,7 +169,7 @@ h2 { font-size: var(--s-duzy); font-weight: 800; font-style: italic; letter-spac
 .profil-top { align-items: center; flex-wrap: wrap; }
 .profil-top > img { width: 128px; height: 128px; image-rendering: pixelated; }
 .profil-top h1 { margin: 0 0 8px; font-size: clamp(40px, 7vw, 96px); font-weight: 900; font-style: italic; letter-spacing: -.04em; line-height: .95; overflow-wrap: anywhere; }
-.staty { margin-left: auto; display: grid; grid-template-columns: repeat(4, auto); gap: 8px 40px; }
+.staty { margin-left: auto; display: grid; grid-template-columns: repeat(5, auto); gap: 8px 36px; }
 .staty b { display: block; font-size: var(--s-duzy); font-weight: 900; font-style: italic; letter-spacing: -.03em; line-height: 1.05; font-variant-numeric: tabular-nums; }
 .staty span { color: var(--drugi); }
 /* Kity gracza: tabela w dwoch kolumnach - kit, tier, ELO i bilans w jednym wierszu. */
@@ -191,6 +191,47 @@ h2 { font-size: var(--s-duzy); font-weight: 800; font-style: italic; letter-spac
 .lista .w .gracz img { width: 24px; height: 24px; }
 .lista .w .prawo { margin-left: auto; text-align: right; }
 .lista .w .kiedy, .lista .w .plak { font-size: 15px; }
+
+/* ---------- Dodatki: rekordy, tiery, forma, filtry, online ---------- */
+.online { color: var(--drugi); font-size: 15px; white-space: nowrap; }
+.stopka-zach .online { color: var(--atrament); margin-left: 6px; }
+
+.kit .naz .maly { margin-left: 2px; }
+.mini-pig button img { width: 18px; height: 18px; image-rendering: pixelated; vertical-align: -3px; margin-right: 6px; }
+.filtry { position: relative; z-index: 1; display: grid; gap: 4px; margin: calc(-1 * var(--skos) + 24px) 0 16px; }
+.filtry .mini-pig { margin: 0; }
+.filtry + div > .mecze { margin-top: 0; }
+
+.tytul { color: var(--atrament); }
+.forma { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; margin: 0 0 14px; }
+.forma-opis { margin-left: 10px; color: var(--drugi); }
+.forma-w { width: 26px; height: 26px; display: grid; place-items: center; font-size: var(--s-maly); font-weight: 800; color: var(--akcent-tekst); }
+.forma-w.wygrana { background: var(--plus); }
+.forma-w.porazka { background: var(--minus); }
+.forma-w.remis { background: var(--drugi); }
+
+.rekordy { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 4px; }
+.rekord { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 20px; padding: 16px 20px; background: var(--pow1); transition: background var(--t-hover); }
+.rekord:hover { background: var(--pow2); }
+.rekord-opis { font-weight: 700; }
+.rekord-opis small { display: block; font-weight: 400; color: var(--drugi); font-size: var(--s-maly); }
+.rekord-liczba { font-size: var(--s-srodek); font-weight: 900; font-style: italic; text-align: right; min-width: 64px; }
+
+.jak { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: calc(-1 * var(--skos) + 24px) 0 96px; }
+.jak > div { background: var(--pow1); padding: 24px 24px 28px; }
+.jak p { margin: 0; }
+.drabinka { display: flex; flex-direction: column; gap: 2px; }
+.szczebel { --kolor: currentColor; position: relative; display: grid; grid-template-columns: 90px 170px 80px 1fr; align-items: center; gap: 20px;
+  padding: 12px 20px 12px 26px; background: var(--pow1); color: var(--atrament); }
+/* Kolor tieru jako wypelniony pasek z lewej (szczebel drabinki). */
+.szczebel::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--k); }
+.szczebel.t1 { --k: var(--t1); } .szczebel.t2 { --k: var(--t2); } .szczebel.t3 { --k: var(--t3); } .szczebel.t4 { --k: var(--t4); } .szczebel.t5 { --k: var(--t5); }
+.szczebel-tier { color: var(--k); font-size: var(--s-srodek); font-weight: 900; font-style: italic; }
+.szczebel-elo, .szczebel-pkt { color: var(--drugi); }
+.szczebel-gracze { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: flex-end; }
+.szczebel-gracze .gracz { gap: 6px; }
+.szczebel-gracze .gracz img { width: 26px; height: 26px; }
+.tytuly .w b { min-width: 140px; }
 
 /* ---------- Stopka: adres serwera na cala szerokosc ---------- */
 footer { background: var(--pole); padding: 96px var(--kraniec) 40px; }
@@ -286,6 +327,14 @@ footer { background: var(--pole); padding: 96px var(--kraniec) 40px; }
   .podium-karta.wolne .podium-nick { margin-top: 24px; }
   .wolne-opis { display: none; }
   .podium-karta.wolne .podium-nick { white-space: normal; text-align: center; }
+  .rekordy { grid-template-columns: 1fr; }
+  .rekord { grid-template-columns: 1fr auto; gap: 8px 16px; padding: 14px 16px; }
+  .rekord > .gracz, .rekord > span:nth-child(2) { grid-row: 2; }
+  .jak { grid-template-columns: 1fr; }
+  .szczebel { grid-template-columns: 64px 1fr auto; gap: 6px 14px; padding-left: 22px; }
+  .szczebel-gracze { grid-column: 1 / -1; justify-content: flex-start; }
+  .szczebel-gracze:has(> .maly:only-child) { display: none; }
+  .pasek .online { display: none; }
   .kity { grid-template-columns: 1fr; }
   .kit { grid-template-columns: 1fr auto; padding: 12px 16px; }
   .kit .elo { grid-column: 1 / -1; text-align: left; margin-top: -8px; }
@@ -303,7 +352,7 @@ footer { background: var(--pole); padding: 96px var(--kraniec) 40px; }
   .karta-gracza { grid-template-columns: 44px 36px 1fr auto; gap: 10px; padding-right: 14px; }
   .karta-gracza > img { width: 36px; height: 36px; }
   .dwie { grid-template-columns: 1fr; }
-  .staty { margin-left: 0; grid-template-columns: repeat(2, auto); gap: 12px 40px; }
+  .staty { margin-left: 0; grid-template-columns: repeat(3, auto); gap: 12px 32px; }
   .profil-top > img { width: 88px; height: 88px; }
   .mecz { grid-template-columns: 1fr auto 1fr; gap: 8px 12px; padding: 14px 16px; }
   .mecz > :first-child { grid-column: 1 / -1; }
