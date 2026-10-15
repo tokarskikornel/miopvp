@@ -193,7 +193,11 @@ h2 { font-size: var(--s-duzy); font-weight: 800; font-style: italic; letter-spac
 .lista .w .kiedy, .lista .w .plak { font-size: 15px; }
 
 /* ---------- Dodatki: rekordy, tiery, forma, filtry, online ---------- */
-.online { color: var(--drugi); font-size: 15px; white-space: nowrap; }
+/* Zielona kropka = serwer dziala (pokazywana tylko, gdy API to potwierdzi). */
+.online { position: relative; display: inline-flex; align-items: center; gap: 8px; color: var(--atrament); font-size: 15px; font-weight: 600; white-space: nowrap; }
+.online[hidden] { display: none; }
+.online::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--plus); flex: none; }
+.online::after { content: ""; position: absolute; left: 0; top: 50%; width: 10px; height: 10px; margin-top: -5px; border-radius: 50%; background: var(--plus); opacity: 0; }
 .stopka-zach .online { color: var(--atrament); margin-left: 6px; }
 
 .kit .naz .maly { margin-left: 2px; }
@@ -252,6 +256,7 @@ footer { background: var(--pole); padding: 96px var(--kraniec) 40px; }
 @keyframes skok { 0%, 100% { transform: none; } 40% { transform: translateY(-4px) rotate(-10deg); } }
 @keyframes litera { from { opacity: 0; transform: translateY(60%) skewX(-8deg); } to { opacity: 1; transform: none; } }
 @keyframes tetno { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.8); opacity: .5; } }
+@keyframes fala { 0% { transform: scale(1); opacity: .6; } 100% { transform: scale(2.6); opacity: 0; } }
 @keyframes rysuj { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 /* Logo: miecz przecina napis od lewej, dolna polowa zsuwa sie po cieciu. */
 @keyframes logo-ciecie { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
@@ -315,6 +320,7 @@ footer { background: var(--pole); padding: 96px var(--kraniec) 40px; }
   .adres.wjazd.widac .litera { animation-play-state: running; }
   .adres:hover .litera { transform: translateY(-8%); }
   .skopiowano { animation: pojaw .25s ease-out; }
+  .online::after { animation: fala 2s ease-out infinite; }
 }
 
 /* ---------- Telefon i tablet: wlasny uklad ---------- */
@@ -334,7 +340,7 @@ footer { background: var(--pole); padding: 96px var(--kraniec) 40px; }
   .szczebel { grid-template-columns: 64px 1fr auto; gap: 6px 14px; padding-left: 22px; }
   .szczebel-gracze { grid-column: 1 / -1; justify-content: flex-start; }
   .szczebel-gracze:has(> .maly:only-child) { display: none; }
-  .pasek .online { display: none; }
+  .pasek .online { order: 3; margin-left: auto; }
   .kity { grid-template-columns: 1fr; }
   .kit { grid-template-columns: 1fr auto; padding: 12px 16px; }
   .kit .elo { grid-column: 1 / -1; text-align: left; margin-top: -8px; }
@@ -376,5 +382,5 @@ footer { background: var(--pole); padding: 96px var(--kraniec) 40px; }
 @media (max-width: 560px) {
   .graj { order: 2; padding: 9px 14px; }
   nav { order: 3; }
-  .szukaj { flex: 1; width: auto; min-width: 0; }
+  .szukaj { width: 100%; }
 }

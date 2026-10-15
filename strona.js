@@ -593,7 +593,8 @@ function online() {
       const ile = s.online && s.players ? s.players.online : null;
       document.querySelectorAll('.online').forEach(e => {
         e.hidden = ile === null;
-        if (ile !== null) e.textContent = ile === 1 ? '1 player online' : ile + ' players online';
+        // W pasku krotko ("3 online"), w stopce pelnym zdaniem.
+        if (ile !== null) e.textContent = e.closest('.pasek') ? ile + ' online' : (ile === 1 ? '1 player online now' : ile + ' players online now');
       });
     })
     .catch(() => {});
