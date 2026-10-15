@@ -583,11 +583,11 @@ document.querySelectorAll('.kopiuj-adres').forEach(b => b.addEventListener('clic
 }));
 
 /**
- * Gracze online z api.mcsrvstat.us. Pokazujemy liczbe tylko, gdy API potwierdzi, ze serwer dziala -
- * API czasem nie widzi serwera przez tunel, a falszywe "offline" byloby gorsze niz brak informacji.
+ * Gracze online z api.mcstatus.io (api.mcsrvstat.us nie widzi serwera przez tunel playit).
+ * Liczbe pokazujemy tylko, gdy API potwierdzi, ze serwer dziala - falszywe "offline" byloby gorsze niz brak informacji.
  */
 function online() {
-  fetch('https://api.mcsrvstat.us/3/miopvp.com')
+  fetch('https://api.mcstatus.io/v2/status/java/miopvp.com')
     .then(r => r.json())
     .then(s => {
       const ile = s.online && s.players ? s.players.online : null;
