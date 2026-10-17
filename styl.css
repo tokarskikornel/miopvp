@@ -389,3 +389,18 @@ footer { background: var(--pole); padding: 96px var(--kraniec) 40px; }
   nav { order: 3; }
   .szukaj { width: 100%; }
 }
+
+/* ---------- Sklep (#sklep): karty rang, kolor rangi jako pasek u gory ---------- */
+.produkty { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin: calc(-1 * var(--skos) + 24px) 0 24px; }
+.produkt { --k: var(--akcent); display: flex; flex-direction: column; gap: 18px; padding: 28px 28px 32px; background: var(--pow1); border-top: 6px solid var(--k); }
+.produkt.vip { --k: #5ee07a; } .produkt.vipplus { --k: #ffb84d; }
+.produkt-nazwa { color: var(--k); font-size: var(--s-duzy); font-weight: 900; font-style: italic; letter-spacing: -.03em; line-height: 1; }
+.produkt-cena b { font-size: var(--s-duzy); font-weight: 900; letter-spacing: -.02em; }
+.produkt-cena span { color: var(--drugi); }
+.produkt ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.produkt li { display: flex; gap: 10px; }
+.produkt li::before { content: "✓"; color: var(--k); font-weight: 900; }
+.produkt .graj { align-self: flex-start; padding: 12px 22px; text-decoration: none; }
+.produkt .graj[disabled] { opacity: .45; cursor: not-allowed; }
+.produkt .graj[disabled]:hover { background: var(--akcent); }
+@media (max-width: 860px) { .produkty { grid-template-columns: 1fr; } }

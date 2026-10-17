@@ -536,15 +536,50 @@ function rysujWykres(punkty) {
     el('span', { class: 'leg-p' }, p + (p === 1 ? ' loss' : ' losses'))));
 }
 
+// ---------- SKLEP ----------
+
+// Link do sklepu Tebex. Pusty = sklep jeszcze nie dziala (przyciski "Store opens soon").
+const SKLEP_URL = '';
+
+// Rangi do kupienia. Perki tylko kosmetyczne/wygodne - regulamin Minecrafta (EULA) zabrania sprzedawania przewagi w walce.
+const RANGI = [
+  { klucz: 'vip', nazwa: 'VIP', cena: '10 zł', perki: [
+    'Green VIP tag in chat and TAB',
+    'Lobby elytra with fireworks (/elytra)',
+    'Lobby spear with Lunge III (/spear)',
+    'You keep the server running'] },
+  { klucz: 'vipplus', nazwa: 'VIP+', cena: '20 zł', perki: [
+    'Everything from VIP',
+    'Gold VIP+ tag, listed higher in TAB',
+    'Host your own tournaments (coming soon)'] },
+];
+
+function pokazSklep() {
+  tresc.replaceChildren(
+    el('div', { class: 'baner' },
+      el('div', {}, el('h1', {}, 'Store'),
+        el('p', { class: 'pod' }, 'Support MIO PVP and get a rank. All perks are cosmetic: nobody can buy an advantage in a fight.'))),
+    kaskada(el('section', { class: 'produkty' }, RANGI.map(r => el('div', { class: 'produkt ' + r.klucz },
+      el('div', { class: 'produkt-nazwa' }, r.nazwa),
+      el('div', { class: 'produkt-cena' }, el('b', { class: 'num' }, r.cena), el('span', {}, ' one-time · rank forever')),
+      el('ul', {}, r.perki.map(p => el('li', {}, p))),
+      SKLEP_URL
+        ? el('a', { class: 'graj', href: SKLEP_URL, target: '_blank', rel: 'noopener' }, 'Buy ' + r.nazwa)
+        : el('button', { class: 'graj', type: 'button', disabled: true }, 'Store opens soon'))))),
+    el('p', { class: 'maly' }, 'The rank is given automatically after payment, to the nick you type in the store. Questions? Ask on our Discord.'));
+}
+
 // ---------- ROUTER I START ----------
 
 function pokaz() {
   const [widok, arg] = decodeURIComponent(location.hash.slice(1)).split('/');
-  document.getElementById('nav-ranking').classList.toggle('akt', widok !== 'mecze' && widok !== 'tiery');
+  document.getElementById('nav-ranking').classList.toggle('akt', !['mecze', 'tiery', 'sklep'].includes(widok));
   document.getElementById('nav-mecze').classList.toggle('akt', widok === 'mecze');
   document.getElementById('nav-tiery').classList.toggle('akt', widok === 'tiery');
+  document.getElementById('nav-sklep').classList.toggle('akt', widok === 'sklep');
   if (widok === 'mecze') pokazMecze();
   else if (widok === 'tiery') pokazTiery();
+  else if (widok === 'sklep') pokazSklep();
   else if (widok === 'gracz' && arg) pokazGracza(arg);
   else pokazRanking(arg || 'ogolny');
   tresc.classList.remove('widok', 'cisza');
